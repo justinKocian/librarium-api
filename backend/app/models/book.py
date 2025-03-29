@@ -1,3 +1,5 @@
+#models/book.py
+
 from sqlalchemy import Column, Integer, String, ForeignKey
 from sqlalchemy.orm import relationship
 from app.database import Base
@@ -13,6 +15,7 @@ class Book(Base):
     series_id = Column(Integer, ForeignKey("series.id"), nullable=True)
     volume = Column(Integer, nullable=True)
     cover_path = Column(String, nullable=True)
+    read_status = Column(String, nullable=True) 
 
     genre = relationship("Genre", back_populates="books")
     series = relationship("Series", back_populates="books")

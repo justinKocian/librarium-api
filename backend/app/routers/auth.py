@@ -1,3 +1,5 @@
+#routers/auth.py
+
 from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy.orm import Session
 from fastapi.security import OAuth2PasswordRequestForm
@@ -16,7 +18,13 @@ def register(user_data: UserCreate, db: Session = Depends(get_db)):
     existing = db.query(auth_service.User).filter_by(username=user_data.username).first()
     if existing:
         raise HTTPException(status_code=400, detail="Username already exists")
-    return auth_service.register_user(db, user_data.username, user_data.password)
+
+    return auth_service.register_user(
+        db,
+        username=user_data.username,
+        password=user_data.password,
+        role=user_data.role  # pass role along
+    )
 
 @router.post("/login", response_model=Token)
 def login(form_data: OAuth2PasswordRequestForm = Depends(), db: Session = Depends(get_db)):

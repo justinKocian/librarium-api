@@ -1,14 +1,43 @@
-from fastapi import APIRouter, Depends, HTTPException
+from typing import Optional, List
+from fastapi import APIRouter, Depends, HTTPException, Query
 from sqlalchemy.orm import Session
+
 from app.models.book import Book
 from app.models.tag import Tag
+from app.models.user import User
 from app.schemas.book import BookCreate, BookUpdate, BookOut
 from app.dependencies.auth import get_current_user, get_current_admin
 from app.database import get_db
+from app.services import book as book_service
 
 router = APIRouter()
 
-@router.get("/", response_model=list[BookOut])
+@router.get("/search", response_model=List[BookOut])
+def search_books(
+    q: Optional[str] = None,
+    genre_id: Optional[int] = None,
+    tag_ids: Optional[List[int]] = Query(default=None),
+    series_id: Optional[int] = None,
+    volume: Optional[int] = None,
+    read_status: Optional[str] = None,
+    limit: int = 20,
+    offset: int = 0,
+    db: Session = Depends(get_db),
+    current_user: User = Depends(get_current_user)
+):
+    return book_service.search_books(
+        db=db,
+        q=q,
+        genre_id=genre_id,
+        tag_ids=tag_ids,
+        series_id=series_id,
+        volume=volume,
+        read_status=read_status,
+        limit=limit,
+        offset=offset,
+    )
+
+@router.get("/", response_model=List[BookOut])
 def get_books(db: Session = Depends(get_db)):
     return db.query(Book).all()
 

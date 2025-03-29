@@ -1,3 +1,5 @@
+#models/user.py
+
 from sqlalchemy import Column, Integer, String, Enum as SqlEnum
 from sqlalchemy.orm import relationship
 from app.database import Base
