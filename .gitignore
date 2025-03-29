@@ -1,0 +1,75 @@
+# Byte-compiled / optimized / DLL files
+__pycache__/
+*.py[cod]
+*.pyo
+
+# Python virtual environments
+venv/
+.env
+.env.*
+
+# Pytest
+.cache/
+.pytest_cache/
+
+# IDEs/editors
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Logs
+*.log
+
+# Node.js dependencies (frontend)
+frontend/node_modules/
+frontend/build/
+frontend/.next/  # if using Next.js
+frontend/.env*
+
+# React build
+frontend/dist/
+
+# Docker
+*.pid
+*.pid.lock
+*.sock
+
+# Ignore Postgres/pgAdmin volumes (if mounted locally)
+pgdata/
+pgadmin/
+
+# Docker Compose override files
+docker-compose.override.yml
+
+# SQLite (in case of testing/dev use)
+*.sqlite3
+
+# Coverage reports
+htmlcov/
+.coverage
+coverage.xml
+
+# Mypy / type checking
+.mypy_cache/
+
+# Pylint / Linting tools
+pylint-report.txt
+
+# FastAPI auto-generated OpenAPI files
+openapi.json
+
+# Local dev
+*.db
+*.bak
+*.tmp
+
+# VSCode specific settings
+.vscode/
+
+# MacOS folder
+__MACOSX/
