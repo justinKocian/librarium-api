@@ -1,4 +1,4 @@
-from pydantic import BaseModel
+from pydantic import BaseModel, ConfigDict
 from enum import Enum
 from typing import Optional
 
@@ -19,8 +19,7 @@ class UserOut(BaseModel):
     username: str
     role: UserRole
 
-    class Config:
-        from_attributes = True  # replaces orm_mode in Pydantic v2
+    model_config = ConfigDict(from_attributes=True)
 
 
 class UserRead(UserOut):
@@ -31,3 +30,9 @@ class UserUpdate(BaseModel):
     username: Optional[str] = None
     password: Optional[str] = None
     role: Optional[UserRole] = None
+
+
+class UserWithTokenResponse(BaseModel):
+    user: UserRead
+    access_token: str
+    token_type: str = "bearer"

@@ -39,3 +39,6 @@ def get_db():
         yield db
     finally:
         db.close()
+
+# ✅ Import models only after Base is declared to avoid circular imports
+from app.models import user_books

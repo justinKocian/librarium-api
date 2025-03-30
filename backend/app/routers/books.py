@@ -50,7 +50,7 @@ def get_book(book_id: int, db: Session = Depends(get_db)):
 
 @router.post("/", response_model=BookOut)
 def create_book(data: BookCreate, db: Session = Depends(get_db), admin=Depends(get_current_admin)):
-    book = Book(**data.dict(exclude={"tag_ids"}))
+    book = Book(**data.model_dump(exclude={"tag_ids"}))
     if data.tag_ids:
         tags = db.query(Tag).filter(Tag.id.in_(data.tag_ids)).all()
         book.tags = tags
@@ -65,7 +65,7 @@ def update_book(book_id: int, data: BookUpdate, db: Session = Depends(get_db), a
     if not book:
         raise HTTPException(status_code=404, detail="Book not found")
 
-    for field, value in data.dict(exclude_unset=True, exclude={"tag_ids"}).items():
+    for field, value in data.model_dump(exclude_unset=True, exclude={"tag_ids"}).items():
         setattr(book, field, value)
 
     if data.tag_ids is not None:

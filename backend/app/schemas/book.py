@@ -40,5 +40,5 @@ class BookOut(BookBase):
     tags: List[TagRead]
     series: Optional[SeriesRead] = None
 
-    class Config:
-        from_attributes = True
+
+

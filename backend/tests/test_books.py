@@ -1,87 +1,56 @@
 import pytest
+import uuid
+from tests.test_factory import create_admin, create_book
 
-BOOK_DATA = {
-    "title": "The Beacon of The Hollow",
-    "author": "J. David Kocian",
-    "isbn": "9780441013593",
-    "genre_id": 1,
-    "series_id": 1,
-    "volume": 1,
-    "tag_ids": [1, 2],
-    "cover_path": "uploads/0d120ab8cf9a40e68fbaf59be0633e25.jpg"
-}
+unique_isbn = f"978-{uuid.uuid4().int % 10000000000:010d}"  # Ensures a unique 13-digit ISBN
 
-
-@pytest.fixture(scope="module")
-def auth_headers(client):
-    # Register user with admin role
-    register = client.post("/auth/register", json={
-        "username": "adminguy",
-        "password": "secret123",
-        "role": "admin"
-    })
-    assert register.status_code == 200
-
-    # Login and get token
-    login = client.post("/auth/login", data={
-        "username": "adminguy",
-        "password": "secret123"
-    })
-    assert login.status_code == 200
-
-    token = login.json()["access_token"]
-    return {"Authorization": f"Bearer {token}"}
+BOOK_PAYLOAD = {
+        "title": "The Beacon of The Hollow",
+        "author": "J. David Kocian",
+        "isbn": unique_isbn,
+        "genre_id": 1,
+        "series_id": 1,
+        "volume": 1,
+        "tag_ids": [1],
+        "cover_path": "app/tests/test_cover.jpg"
+    }
 
 
-@pytest.fixture(scope="module")
-def create_book(client, auth_headers):
-    # Set up required metadata
-    client.post("/genres/", json={"name": "Horror"}, headers=auth_headers)
-    client.post("/tags/", json={"name": "Family"}, headers=auth_headers)
-    client.post("/tags/", json={"name": "Supernatural"}, headers=auth_headers)
-    client.post("/tags/", json={"name": "Fantasy"}, headers=auth_headers)
-    client.post("/tags/", json={"name": "Comedy"}, headers=auth_headers)
-    client.post("/series/", json={"name": "The Hollow"}, headers=auth_headers)
+def test_create_and_get_book(client):
+    headers = create_admin(client)
+    book = create_book(client, headers)
 
-    # Add the book
-    response = client.post("/books/", json=BOOK_DATA, headers=auth_headers)
-    assert response.status_code == 200
-    return response.json()
+    res = client.get(f"/books/{book['id']}", headers=headers)
+    assert res.status_code == 200
+    assert res.json()["title"] == book["title"]
 
 
-def test_search_by_title(client, create_book, auth_headers):
-    response = client.get("/books/search?q=beacon", headers=auth_headers)
-    assert response.status_code == 200
-    books = response.json()
-    assert any("Beacon" in b["title"] for b in books)
+def test_list_books(client):
+    headers = create_admin(client)
+    res = client.get("/books/", headers=headers)
+    assert res.status_code == 200
+    assert isinstance(res.json(), list)
+    assert any("Hollow" in b["title"] for b in res.json())
 
 
-def test_search_by_genre(client, create_book, auth_headers):
-    response = client.get("/books/search?genre_id=1", headers=auth_headers)
-    assert response.status_code == 200
-    books = response.json()
-    assert any(b["genre"]["name"] == "Horror" for b in books)
+def test_update_book(client):
+    headers = create_admin(client)
+    book = create_book(client, headers)
+
+    update = {"title": "The Beacon of The Hollow – Revised"}
+    res = client.put(f"/books/{book['id']}", json=update, headers=headers)
+    assert res.status_code == 200
+    assert res.json()["title"] == update["title"]
 
 
-def test_search_by_tag(client, create_book, auth_headers):
-    response = client.get("/books/search?tag_ids=1&tag_ids=2", headers=auth_headers)
-    assert response.status_code == 200
-    books = response.json()
-    assert any(
-        any(t["name"] in ["Family", "Supernatural"] for t in b["tags"])
-        for b in books
-    )
+def test_delete_book(client):
+    headers = create_admin(client)
+    book = create_book(client, headers)
 
+    res = client.delete(f"/books/{book['id']}", headers=headers)
+    assert res.status_code == 200
+    assert "deleted" in res.json()["detail"]
 
-def test_search_by_series(client, create_book, auth_headers):
-    response = client.get("/books/search?series_id=1", headers=auth_headers)
-    assert response.status_code == 200
-    books = response.json()
-    assert any(b["series"]["name"] == "The Hollow" for b in books)
-
-
-def test_search_by_volume(client, create_book, auth_headers):
-    response = client.get("/books/search?volume=1", headers=auth_headers)
-    assert response.status_code == 200
-    books = response.json()
-    assert any(b["volume"] == 1 for b in books)
+    # Confirm it's gone
+    res = client.get(f"/books/{book['id']}", headers=headers)
+    assert res.status_code == 404

@@ -1,0 +1,2161 @@
+[H[2J[3JREFRESHIHNG DEV ENVIRONMENT
+Tearing down...
+
+Rebuilding...
+#0 building with "default" instance using docker driver
+
+#1 [backend internal] load build definition from Dockerfile
+#1 transferring dockerfile: 246B done
+#1 DONE 0.0s
+
+#2 [backend internal] load metadata for docker.io/library/python:3.11
+#2 DONE 0.3s
+
+#3 [backend internal] load .dockerignore
+#3 transferring context: 2B done
+#3 DONE 0.0s
+
+#4 [backend 1/5] FROM docker.io/library/python:3.11@sha256:ebfa8696e47a68cffebb31e370a93ce57c01bc753f246ceaaef72801d1661351
+#4 DONE 0.0s
+
+#5 [backend internal] load build context
+#5 transferring context: 7.16kB done
+#5 DONE 0.0s
+
+#6 [backend 2/5] WORKDIR /app
+#6 CACHED
+
+#7 [backend 3/5] COPY requirements.txt .
+#7 CACHED
+
+#8 [backend 4/5] RUN pip install --no-cache-dir -r requirements.txt
+#8 CACHED
+
+#9 [backend 5/5] COPY ./app ./app
+#9 DONE 0.1s
+
+#10 [backend] exporting to image
+#10 exporting layers 0.0s done
+#10 writing image sha256:453444e10aae06be27a4490af4bc86d751b0f379c42b8f58ac873fd9b7360fd8 done
+#10 naming to docker.io/library/librarium-api-backend done
+#10 DONE 0.0s
+
+#11 [backend] resolving provenance for metadata file
+#11 DONE 0.0s
+
+Seeding test data and performing tests...
+============================= test session starts ==============================
+platform linux -- Python 3.11.11, pytest-8.1.1, pluggy-1.5.0 -- /usr/local/bin/python3.11
+cachedir: .pytest_cache
+rootdir: /app
+configfile: pytest.ini
+testpaths: tests
+plugins: anyio-4.9.0
+collecting ... collected 25 items
+
+tests/test_auth.py::test_user_can_register PASSED                        [  4%]
+tests/test_auth.py::test_duplicate_username_fails PASSED                 [  8%]
+tests/test_auth.py::test_user_can_login PASSED                           [ 12%]
+tests/test_auth.py::test_me_returns_current_user PASSED                  [ 16%]
+tests/test_auth.py::test_user_can_update_their_own_account PASSED        [ 20%]
+tests/test_auth.py::test_updated_user_can_still_authenticate PASSED      [ 24%]
+tests/test_books.py::test_create_and_get_book PASSED                     [ 28%]
+tests/test_books.py::test_list_books PASSED                              [ 32%]
+tests/test_books.py::test_update_book FAILED                             [ 36%]
+tests/test_books.py::test_delete_book FAILED                             [ 40%]
+tests/test_genres.py::test_admin_can_create_genre PASSED                 [ 44%]
+tests/test_genres.py::test_admin_can_list_genres PASSED                  [ 48%]
+tests/test_series.py::test_admin_can_create_series PASSED                [ 52%]
+tests/test_series.py::test_admin_can_list_series PASSED                  [ 56%]
+tests/test_tags.py::test_admin_can_create_tag PASSED                     [ 60%]
+tests/test_tags.py::test_admin_can_list_tags PASSED                      [ 64%]
+tests/test_upload.py::test_upload_cover_image FAILED                     [ 68%]
+tests/test_user_books.py::test_add_reading_status ERROR                  [ 72%]
+tests/test_user_books.py::test_get_reading_status ERROR                  [ 76%]
+tests/test_user_books.py::test_update_reading_status ERROR               [ 80%]
+tests/test_user_books.py::test_list_reading_statuses ERROR               [ 84%]
+tests/test_user_books.py::test_delete_reading_status ERROR               [ 88%]
+tests/test_users.py::test_admin_can_get_user_by_id PASSED                [ 92%]
+tests/test_users.py::test_admin_gets_404_for_invalid_user PASSED         [ 96%]
+tests/test_users.py::test_admin_can_delete_user PASSED                   [100%]
+
+==================================== ERRORS ====================================
+__________________ ERROR at setup of test_add_reading_status ___________________
+
+self = <sqlalchemy.engine.base.Connection object at 0x7f6611d60890>
+dialect = <sqlalchemy.dialects.postgresql.psycopg2.PGDialect_psycopg2 object at 0x7f6615bff6d0>
+context = <sqlalchemy.dialects.postgresql.psycopg2.PGExecutionContext_psycopg2 object at 0x7f66106cc650>
+statement = <sqlalchemy.dialects.postgresql.base.PGCompiler object at 0x7f66105d1810>
+parameters = [{'author': 'J. K. Lantern', 'cover_path': 'uploads/fake_cover.jpg', 'genre_id': 1, 'isbn': '9780123456789', ...}]
+
+    def _exec_single_context(
+        self,
+        dialect: Dialect,
+        context: ExecutionContext,
+        statement: Union[str, Compiled],
+        parameters: Optional[_AnyMultiExecuteParams],
+    ) -> CursorResult[Any]:
+        """continue the _execute_context() method for a single DBAPI
+        cursor.execute() or cursor.executemany() call.
+    
+        """
+        if dialect.bind_typing is BindTyping.SETINPUTSIZES:
+            generic_setinputsizes = context._prepare_set_input_sizes()
+    
+            if generic_setinputsizes:
+                try:
+                    dialect.do_set_input_sizes(
+                        context.cursor, generic_setinputsizes, context
+                    )
+                except BaseException as e:
+                    self._handle_dbapi_exception(
+                        e, str(statement), parameters, None, context
+                    )
+    
+        cursor, str_statement, parameters = (
+            context.cursor,
+            context.statement,
+            context.parameters,
+        )
+    
+        effective_parameters: Optional[_AnyExecuteParams]
+    
+        if not context.executemany:
+            effective_parameters = parameters[0]
+        else:
+            effective_parameters = parameters
+    
+        if self._has_events or self.engine._has_events:
+            for fn in self.dispatch.before_cursor_execute:
+                str_statement, effective_parameters = fn(
+                    self,
+                    cursor,
+                    str_statement,
+                    effective_parameters,
+                    context,
+                    context.executemany,
+                )
+    
+        if self._echo:
+            self._log_info(str_statement)
+    
+            stats = context._get_cache_stats()
+    
+            if not self.engine.hide_parameters:
+                self._log_info(
+                    "[%s] %r",
+                    stats,
+                    sql_util._repr_params(
+                        effective_parameters,
+                        batches=10,
+                        ismulti=context.executemany,
+                    ),
+                )
+            else:
+                self._log_info(
+                    "[%s] [SQL parameters hidden due to hide_parameters=True]",
+                    stats,
+                )
+    
+        evt_handled: bool = False
+        try:
+            if context.execute_style is ExecuteStyle.EXECUTEMANY:
+                effective_parameters = cast(
+                    "_CoreMultiExecuteParams", effective_parameters
+                )
+                if self.dialect._has_events:
+                    for fn in self.dialect.dispatch.do_executemany:
+                        if fn(
+                            cursor,
+                            str_statement,
+                            effective_parameters,
+                            context,
+                        ):
+                            evt_handled = True
+                            break
+                if not evt_handled:
+                    self.dialect.do_executemany(
+                        cursor,
+                        str_statement,
+                        effective_parameters,
+                        context,
+                    )
+            elif not effective_parameters and context.no_parameters:
+                if self.dialect._has_events:
+                    for fn in self.dialect.dispatch.do_execute_no_params:
+                        if fn(cursor, str_statement, context):
+                            evt_handled = True
+                            break
+                if not evt_handled:
+                    self.dialect.do_execute_no_params(
+                        cursor, str_statement, context
+                    )
+            else:
+                effective_parameters = cast(
+                    "_CoreSingleExecuteParams", effective_parameters
+                )
+                if self.dialect._has_events:
+                    for fn in self.dialect.dispatch.do_execute:
+                        if fn(
+                            cursor,
+                            str_statement,
+                            effective_parameters,
+                            context,
+                        ):
+                            evt_handled = True
+                            break
+                if not evt_handled:
+>                   self.dialect.do_execute(
+                        cursor, str_statement, effective_parameters, context
+                    )
+
+/usr/local/lib/python3.11/site-packages/sqlalchemy/engine/base.py:1960: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = <sqlalchemy.dialects.postgresql.psycopg2.PGDialect_psycopg2 object at 0x7f6615bff6d0>
+cursor = <cursor object at 0x7f66106a9210; closed: -1>
+statement = 'INSERT INTO books (title, author, isbn, genre_id, series_id, volume, cover_path, read_status) VALUES (%(title)s, %(author)s, %(isbn)s, %(genre_id)s, %(series_id)s, %(volume)s, %(cover_path)s, %(read_status)s) RETURNING books.id'
+parameters = {'author': 'J. K. Lantern', 'cover_path': 'uploads/fake_cover.jpg', 'genre_id': 1, 'isbn': '9780123456789', ...}
+context = <sqlalchemy.dialects.postgresql.psycopg2.PGExecutionContext_psycopg2 object at 0x7f66106cc650>
+
+    def do_execute(self, cursor, statement, parameters, context=None):
+>       cursor.execute(statement, parameters)
+E       psycopg2.errors.UniqueViolation: duplicate key value violates unique constraint "books_isbn_key"
+E       DETAIL:  Key (isbn)=(9780123456789) already exists.
+
+/usr/local/lib/python3.11/site-packages/sqlalchemy/engine/default.py:924: UniqueViolation
+
+The above exception was the direct cause of the following exception:
+
+client = <starlette.testclient.TestClient object at 0x7f66106f8550>
+
+    @pytest.fixture(scope="module")
+    def book_and_user(client):
+        headers = create_admin(client)
+>       book = create_book(client, headers)
+
+tests/test_user_books.py:7: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/test_factory.py:56: in create_book
+    res = client.post("/books/", json=book_data, headers=headers)
+/usr/local/lib/python3.11/site-packages/starlette/testclient.py:608: in post
+    return super().post(
+/usr/local/lib/python3.11/site-packages/httpx/_client.py:1145: in post
+    return self.request(
+/usr/local/lib/python3.11/site-packages/starlette/testclient.py:491: in request
+    return super().request(
+/usr/local/lib/python3.11/site-packages/httpx/_client.py:827: in request
+    return self.send(request, auth=auth, follow_redirects=follow_redirects)
+/usr/local/lib/python3.11/site-packages/httpx/_client.py:914: in send
+    response = self._send_handling_auth(
+/usr/local/lib/python3.11/site-packages/httpx/_client.py:942: in _send_handling_auth
+    response = self._send_handling_redirects(
+/usr/local/lib/python3.11/site-packages/httpx/_client.py:979: in _send_handling_redirects
+    response = self._send_single_request(request)
+/usr/local/lib/python3.11/site-packages/httpx/_client.py:1015: in _send_single_request
+    response = transport.handle_request(request)
+/usr/local/lib/python3.11/site-packages/starlette/testclient.py:372: in handle_request
+    raise exc
+/usr/local/lib/python3.11/site-packages/starlette/testclient.py:369: in handle_request
+    portal.call(self.app, scope, receive, send)
+/usr/local/lib/python3.11/site-packages/anyio/from_thread.py:290: in call
+    return cast(T_Retval, self.start_task_soon(func, *args).result())
+/usr/local/lib/python3.11/concurrent/futures/_base.py:456: in result
+    return self.__get_result()
+/usr/local/lib/python3.11/concurrent/futures/_base.py:401: in __get_result
+    raise self._exception
+/usr/local/lib/python3.11/site-packages/anyio/from_thread.py:221: in _call_func
+    retval = await retval_or_awaitable
+/usr/local/lib/python3.11/site-packages/fastapi/applications.py:1054: in __call__
+    await super().__call__(scope, receive, send)
+/usr/local/lib/python3.11/site-packages/starlette/applications.py:123: in __call__
+    await self.middleware_stack(scope, receive, send)
+/usr/local/lib/python3.11/site-packages/starlette/middleware/errors.py:186: in __call__
+    raise exc
+/usr/local/lib/python3.11/site-packages/starlette/middleware/errors.py:164: in __call__
+    await self.app(scope, receive, _send)
+/usr/local/lib/python3.11/site-packages/starlette/middleware/exceptions.py:62: in __call__
+    await wrap_app_handling_exceptions(self.app, conn)(scope, receive, send)
+/usr/local/lib/python3.11/site-packages/starlette/_exception_handler.py:64: in wrapped_app
+    raise exc
+/usr/local/lib/python3.11/site-packages/starlette/_exception_handler.py:53: in wrapped_app
+    await app(scope, receive, sender)
+/usr/local/lib/python3.11/site-packages/starlette/routing.py:758: in __call__
+    await self.middleware_stack(scope, receive, send)
+/usr/local/lib/python3.11/site-packages/starlette/routing.py:778: in app
+    await route.handle(scope, receive, send)
+/usr/local/lib/python3.11/site-packages/starlette/routing.py:299: in handle
+    await self.app(scope, receive, send)
+/usr/local/lib/python3.11/site-packages/starlette/routing.py:79: in app
+    await wrap_app_handling_exceptions(app, request)(scope, receive, send)
+/usr/local/lib/python3.11/site-packages/starlette/_exception_handler.py:64: in wrapped_app
+    raise exc
+/usr/local/lib/python3.11/site-packages/starlette/_exception_handler.py:53: in wrapped_app
+    await app(scope, receive, sender)
+/usr/local/lib/python3.11/site-packages/starlette/routing.py:74: in app
+    response = await func(request)
+/usr/local/lib/python3.11/site-packages/fastapi/routing.py:278: in app
+    raw_response = await run_endpoint_function(
+/usr/local/lib/python3.11/site-packages/fastapi/routing.py:193: in run_endpoint_function
+    return await run_in_threadpool(dependant.call, **values)
+/usr/local/lib/python3.11/site-packages/starlette/concurrency.py:42: in run_in_threadpool
+    return await anyio.to_thread.run_sync(func, *args)
+/usr/local/lib/python3.11/site-packages/anyio/to_thread.py:56: in run_sync
+    return await get_async_backend().run_sync_in_worker_thread(
+/usr/local/lib/python3.11/site-packages/anyio/_backends/_asyncio.py:2470: in run_sync_in_worker_thread
+    return await future
+/usr/local/lib/python3.11/site-packages/anyio/_backends/_asyncio.py:967: in run
+    result = context.run(func, *args)
+app/routers/books.py:58: in create_book
+    db.commit()
+/usr/local/lib/python3.11/site-packages/sqlalchemy/orm/session.py:1972: in commit
+    trans.commit(_to_root=True)
+<string>:2: in commit
+    ???
+/usr/local/lib/python3.11/site-packages/sqlalchemy/orm/state_changes.py:139: in _go
+    ret_value = fn(self, *arg, **kw)
+/usr/local/lib/python3.11/site-packages/sqlalchemy/orm/session.py:1257: in commit
+    self._prepare_impl()
+<string>:2: in _prepare_impl
+    ???
+/usr/local/lib/python3.11/site-packages/sqlalchemy/orm/state_changes.py:139: in _go
+    ret_value = fn(self, *arg, **kw)
+/usr/local/lib/python3.11/site-packages/sqlalchemy/orm/session.py:1232: in _prepare_impl
+    self.session.flush()
+/usr/local/lib/python3.11/site-packages/sqlalchemy/orm/session.py:4296: in flush
+    self._flush(objects)
+/usr/local/lib/python3.11/site-packages/sqlalchemy/orm/session.py:4431: in _flush
+    with util.safe_reraise():
+/usr/local/lib/python3.11/site-packages/sqlalchemy/util/langhelpers.py:146: in __exit__
+    raise exc_value.with_traceback(exc_tb)
+/usr/local/lib/python3.11/site-packages/sqlalchemy/orm/session.py:4392: in _flush
+    flush_context.execute()
+/usr/local/lib/python3.11/site-packages/sqlalchemy/orm/unitofwork.py:466: in execute
+    rec.execute(self)
+/usr/local/lib/python3.11/site-packages/sqlalchemy/orm/unitofwork.py:642: in execute
+    util.preloaded.orm_persistence.save_obj(
+/usr/local/lib/python3.11/site-packages/sqlalchemy/orm/persistence.py:93: in save_obj
+    _emit_insert_statements(
+/usr/local/lib/python3.11/site-packages/sqlalchemy/orm/persistence.py:1233: in _emit_insert_statements
+    result = connection.execute(
+/usr/local/lib/python3.11/site-packages/sqlalchemy/engine/base.py:1408: in execute
+    return meth(
+/usr/local/lib/python3.11/site-packages/sqlalchemy/sql/elements.py:513: in _execute_on_connection
+    return connection._execute_clauseelement(
+/usr/local/lib/python3.11/site-packages/sqlalchemy/engine/base.py:1630: in _execute_clauseelement
+    ret = self._execute_context(
+/usr/local/lib/python3.11/site-packages/sqlalchemy/engine/base.py:1839: in _execute_context
+    return self._exec_single_context(
+/usr/local/lib/python3.11/site-packages/sqlalchemy/engine/base.py:1979: in _exec_single_context
+    self._handle_dbapi_exception(
+/usr/local/lib/python3.11/site-packages/sqlalchemy/engine/base.py:2335: in _handle_dbapi_exception
+    raise sqlalchemy_exception.with_traceback(exc_info[2]) from e
+/usr/local/lib/python3.11/site-packages/sqlalchemy/engine/base.py:1960: in _exec_single_context
+    self.dialect.do_execute(
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = <sqlalchemy.dialects.postgresql.psycopg2.PGDialect_psycopg2 object at 0x7f6615bff6d0>
+cursor = <cursor object at 0x7f66106a9210; closed: -1>
+statement = 'INSERT INTO books (title, author, isbn, genre_id, series_id, volume, cover_path, read_status) VALUES (%(title)s, %(author)s, %(isbn)s, %(genre_id)s, %(series_id)s, %(volume)s, %(cover_path)s, %(read_status)s) RETURNING books.id'
+parameters = {'author': 'J. K. Lantern', 'cover_path': 'uploads/fake_cover.jpg', 'genre_id': 1, 'isbn': '9780123456789', ...}
+context = <sqlalchemy.dialects.postgresql.psycopg2.PGExecutionContext_psycopg2 object at 0x7f66106cc650>
+
+    def do_execute(self, cursor, statement, parameters, context=None):
+>       cursor.execute(statement, parameters)
+E       sqlalchemy.exc.IntegrityError: (psycopg2.errors.UniqueViolation) duplicate key value violates unique constraint "books_isbn_key"
+E       DETAIL:  Key (isbn)=(9780123456789) already exists.
+E       
+E       [SQL: INSERT INTO books (title, author, isbn, genre_id, series_id, volume, cover_path, read_status) VALUES (%(title)s, %(author)s, %(isbn)s, %(genre_id)s, %(series_id)s, %(volume)s, %(cover_path)s, %(read_status)s) RETURNING books.id]
+E       [parameters: {'title': 'The Hollow Beacon', 'author': 'J. K. Lantern', 'isbn': '9780123456789', 'genre_id': 1, 'series_id': 1, 'volume': 1, 'cover_path': 'uploads/fake_cover.jpg', 'read_status': None}]
+E       (Background on this error at: https://sqlalche.me/e/20/gkpj)
+
+/usr/local/lib/python3.11/site-packages/sqlalchemy/engine/default.py:924: IntegrityError
+__________________ ERROR at setup of test_get_reading_status ___________________
+
+self = <sqlalchemy.engine.base.Connection object at 0x7f6611d60890>
+dialect = <sqlalchemy.dialects.postgresql.psycopg2.PGDialect_psycopg2 object at 0x7f6615bff6d0>
+context = <sqlalchemy.dialects.postgresql.psycopg2.PGExecutionContext_psycopg2 object at 0x7f66106cc650>
+statement = <sqlalchemy.dialects.postgresql.base.PGCompiler object at 0x7f66105d1810>
+parameters = [{'author': 'J. K. Lantern', 'cover_path': 'uploads/fake_cover.jpg', 'genre_id': 1, 'isbn': '9780123456789', ...}]
+
+    def _exec_single_context(
+        self,
+        dialect: Dialect,
+        context: ExecutionContext,
+        statement: Union[str, Compiled],
+        parameters: Optional[_AnyMultiExecuteParams],
+    ) -> CursorResult[Any]:
+        """continue the _execute_context() method for a single DBAPI
+        cursor.execute() or cursor.executemany() call.
+    
+        """
+        if dialect.bind_typing is BindTyping.SETINPUTSIZES:
+            generic_setinputsizes = context._prepare_set_input_sizes()
+    
+            if generic_setinputsizes:
+                try:
+                    dialect.do_set_input_sizes(
+                        context.cursor, generic_setinputsizes, context
+                    )
+                except BaseException as e:
+                    self._handle_dbapi_exception(
+                        e, str(statement), parameters, None, context
+                    )
+    
+        cursor, str_statement, parameters = (
+            context.cursor,
+            context.statement,
+            context.parameters,
+        )
+    
+        effective_parameters: Optional[_AnyExecuteParams]
+    
+        if not context.executemany:
+            effective_parameters = parameters[0]
+        else:
+            effective_parameters = parameters
+    
+        if self._has_events or self.engine._has_events:
+            for fn in self.dispatch.before_cursor_execute:
+                str_statement, effective_parameters = fn(
+                    self,
+                    cursor,
+                    str_statement,
+                    effective_parameters,
+                    context,
+                    context.executemany,
+                )
+    
+        if self._echo:
+            self._log_info(str_statement)
+    
+            stats = context._get_cache_stats()
+    
+            if not self.engine.hide_parameters:
+                self._log_info(
+                    "[%s] %r",
+                    stats,
+                    sql_util._repr_params(
+                        effective_parameters,
+                        batches=10,
+                        ismulti=context.executemany,
+                    ),
+                )
+            else:
+                self._log_info(
+                    "[%s] [SQL parameters hidden due to hide_parameters=True]",
+                    stats,
+                )
+    
+        evt_handled: bool = False
+        try:
+            if context.execute_style is ExecuteStyle.EXECUTEMANY:
+                effective_parameters = cast(
+                    "_CoreMultiExecuteParams", effective_parameters
+                )
+                if self.dialect._has_events:
+                    for fn in self.dialect.dispatch.do_executemany:
+                        if fn(
+                            cursor,
+                            str_statement,
+                            effective_parameters,
+                            context,
+                        ):
+                            evt_handled = True
+                            break
+                if not evt_handled:
+                    self.dialect.do_executemany(
+                        cursor,
+                        str_statement,
+                        effective_parameters,
+                        context,
+                    )
+            elif not effective_parameters and context.no_parameters:
+                if self.dialect._has_events:
+                    for fn in self.dialect.dispatch.do_execute_no_params:
+                        if fn(cursor, str_statement, context):
+                            evt_handled = True
+                            break
+                if not evt_handled:
+                    self.dialect.do_execute_no_params(
+                        cursor, str_statement, context
+                    )
+            else:
+                effective_parameters = cast(
+                    "_CoreSingleExecuteParams", effective_parameters
+                )
+                if self.dialect._has_events:
+                    for fn in self.dialect.dispatch.do_execute:
+                        if fn(
+                            cursor,
+                            str_statement,
+                            effective_parameters,
+                            context,
+                        ):
+                            evt_handled = True
+                            break
+                if not evt_handled:
+>                   self.dialect.do_execute(
+                        cursor, str_statement, effective_parameters, context
+                    )
+
+/usr/local/lib/python3.11/site-packages/sqlalchemy/engine/base.py:1960: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = <sqlalchemy.dialects.postgresql.psycopg2.PGDialect_psycopg2 object at 0x7f6615bff6d0>
+cursor = <cursor object at 0x7f66106a9210; closed: -1>
+statement = 'INSERT INTO books (title, author, isbn, genre_id, series_id, volume, cover_path, read_status) VALUES (%(title)s, %(author)s, %(isbn)s, %(genre_id)s, %(series_id)s, %(volume)s, %(cover_path)s, %(read_status)s) RETURNING books.id'
+parameters = {'author': 'J. K. Lantern', 'cover_path': 'uploads/fake_cover.jpg', 'genre_id': 1, 'isbn': '9780123456789', ...}
+context = <sqlalchemy.dialects.postgresql.psycopg2.PGExecutionContext_psycopg2 object at 0x7f66106cc650>
+
+    def do_execute(self, cursor, statement, parameters, context=None):
+>       cursor.execute(statement, parameters)
+E       psycopg2.errors.UniqueViolation: duplicate key value violates unique constraint "books_isbn_key"
+E       DETAIL:  Key (isbn)=(9780123456789) already exists.
+
+/usr/local/lib/python3.11/site-packages/sqlalchemy/engine/default.py:924: UniqueViolation
+
+The above exception was the direct cause of the following exception:
+
+client = <starlette.testclient.TestClient object at 0x7f66106f8550>
+
+    @pytest.fixture(scope="module")
+    def book_and_user(client):
+        headers = create_admin(client)
+>       book = create_book(client, headers)
+
+tests/test_user_books.py:7: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/test_factory.py:56: in create_book
+    res = client.post("/books/", json=book_data, headers=headers)
+/usr/local/lib/python3.11/site-packages/starlette/testclient.py:608: in post
+    return super().post(
+/usr/local/lib/python3.11/site-packages/httpx/_client.py:1145: in post
+    return self.request(
+/usr/local/lib/python3.11/site-packages/starlette/testclient.py:491: in request
+    return super().request(
+/usr/local/lib/python3.11/site-packages/httpx/_client.py:827: in request
+    return self.send(request, auth=auth, follow_redirects=follow_redirects)
+/usr/local/lib/python3.11/site-packages/httpx/_client.py:914: in send
+    response = self._send_handling_auth(
+/usr/local/lib/python3.11/site-packages/httpx/_client.py:942: in _send_handling_auth
+    response = self._send_handling_redirects(
+/usr/local/lib/python3.11/site-packages/httpx/_client.py:979: in _send_handling_redirects
+    response = self._send_single_request(request)
+/usr/local/lib/python3.11/site-packages/httpx/_client.py:1015: in _send_single_request
+    response = transport.handle_request(request)
+/usr/local/lib/python3.11/site-packages/starlette/testclient.py:372: in handle_request
+    raise exc
+/usr/local/lib/python3.11/site-packages/starlette/testclient.py:369: in handle_request
+    portal.call(self.app, scope, receive, send)
+/usr/local/lib/python3.11/site-packages/anyio/from_thread.py:290: in call
+    return cast(T_Retval, self.start_task_soon(func, *args).result())
+/usr/local/lib/python3.11/concurrent/futures/_base.py:456: in result
+    return self.__get_result()
+/usr/local/lib/python3.11/concurrent/futures/_base.py:401: in __get_result
+    raise self._exception
+/usr/local/lib/python3.11/site-packages/anyio/from_thread.py:221: in _call_func
+    retval = await retval_or_awaitable
+/usr/local/lib/python3.11/site-packages/fastapi/applications.py:1054: in __call__
+    await super().__call__(scope, receive, send)
+/usr/local/lib/python3.11/site-packages/starlette/applications.py:123: in __call__
+    await self.middleware_stack(scope, receive, send)
+/usr/local/lib/python3.11/site-packages/starlette/middleware/errors.py:186: in __call__
+    raise exc
+/usr/local/lib/python3.11/site-packages/starlette/middleware/errors.py:164: in __call__
+    await self.app(scope, receive, _send)
+/usr/local/lib/python3.11/site-packages/starlette/middleware/exceptions.py:62: in __call__
+    await wrap_app_handling_exceptions(self.app, conn)(scope, receive, send)
+/usr/local/lib/python3.11/site-packages/starlette/_exception_handler.py:64: in wrapped_app
+    raise exc
+/usr/local/lib/python3.11/site-packages/starlette/_exception_handler.py:53: in wrapped_app
+    await app(scope, receive, sender)
+/usr/local/lib/python3.11/site-packages/starlette/routing.py:758: in __call__
+    await self.middleware_stack(scope, receive, send)
+/usr/local/lib/python3.11/site-packages/starlette/routing.py:778: in app
+    await route.handle(scope, receive, send)
+/usr/local/lib/python3.11/site-packages/starlette/routing.py:299: in handle
+    await self.app(scope, receive, send)
+/usr/local/lib/python3.11/site-packages/starlette/routing.py:79: in app
+    await wrap_app_handling_exceptions(app, request)(scope, receive, send)
+/usr/local/lib/python3.11/site-packages/starlette/_exception_handler.py:64: in wrapped_app
+    raise exc
+/usr/local/lib/python3.11/site-packages/starlette/_exception_handler.py:53: in wrapped_app
+    await app(scope, receive, sender)
+/usr/local/lib/python3.11/site-packages/starlette/routing.py:74: in app
+    response = await func(request)
+/usr/local/lib/python3.11/site-packages/fastapi/routing.py:278: in app
+    raw_response = await run_endpoint_function(
+/usr/local/lib/python3.11/site-packages/fastapi/routing.py:193: in run_endpoint_function
+    return await run_in_threadpool(dependant.call, **values)
+/usr/local/lib/python3.11/site-packages/starlette/concurrency.py:42: in run_in_threadpool
+    return await anyio.to_thread.run_sync(func, *args)
+/usr/local/lib/python3.11/site-packages/anyio/to_thread.py:56: in run_sync
+    return await get_async_backend().run_sync_in_worker_thread(
+/usr/local/lib/python3.11/site-packages/anyio/_backends/_asyncio.py:2470: in run_sync_in_worker_thread
+    return await future
+/usr/local/lib/python3.11/site-packages/anyio/_backends/_asyncio.py:967: in run
+    result = context.run(func, *args)
+app/routers/books.py:58: in create_book
+    db.commit()
+/usr/local/lib/python3.11/site-packages/sqlalchemy/orm/session.py:1972: in commit
+    trans.commit(_to_root=True)
+<string>:2: in commit
+    ???
+/usr/local/lib/python3.11/site-packages/sqlalchemy/orm/state_changes.py:139: in _go
+    ret_value = fn(self, *arg, **kw)
+/usr/local/lib/python3.11/site-packages/sqlalchemy/orm/session.py:1257: in commit
+    self._prepare_impl()
+<string>:2: in _prepare_impl
+    ???
+/usr/local/lib/python3.11/site-packages/sqlalchemy/orm/state_changes.py:139: in _go
+    ret_value = fn(self, *arg, **kw)
+/usr/local/lib/python3.11/site-packages/sqlalchemy/orm/session.py:1232: in _prepare_impl
+    self.session.flush()
+/usr/local/lib/python3.11/site-packages/sqlalchemy/orm/session.py:4296: in flush
+    self._flush(objects)
+/usr/local/lib/python3.11/site-packages/sqlalchemy/orm/session.py:4431: in _flush
+    with util.safe_reraise():
+/usr/local/lib/python3.11/site-packages/sqlalchemy/util/langhelpers.py:146: in __exit__
+    raise exc_value.with_traceback(exc_tb)
+/usr/local/lib/python3.11/site-packages/sqlalchemy/orm/session.py:4392: in _flush
+    flush_context.execute()
+/usr/local/lib/python3.11/site-packages/sqlalchemy/orm/unitofwork.py:466: in execute
+    rec.execute(self)
+/usr/local/lib/python3.11/site-packages/sqlalchemy/orm/unitofwork.py:642: in execute
+    util.preloaded.orm_persistence.save_obj(
+/usr/local/lib/python3.11/site-packages/sqlalchemy/orm/persistence.py:93: in save_obj
+    _emit_insert_statements(
+/usr/local/lib/python3.11/site-packages/sqlalchemy/orm/persistence.py:1233: in _emit_insert_statements
+    result = connection.execute(
+/usr/local/lib/python3.11/site-packages/sqlalchemy/engine/base.py:1408: in execute
+    return meth(
+/usr/local/lib/python3.11/site-packages/sqlalchemy/sql/elements.py:513: in _execute_on_connection
+    return connection._execute_clauseelement(
+/usr/local/lib/python3.11/site-packages/sqlalchemy/engine/base.py:1630: in _execute_clauseelement
+    ret = self._execute_context(
+/usr/local/lib/python3.11/site-packages/sqlalchemy/engine/base.py:1839: in _execute_context
+    return self._exec_single_context(
+/usr/local/lib/python3.11/site-packages/sqlalchemy/engine/base.py:1979: in _exec_single_context
+    self._handle_dbapi_exception(
+/usr/local/lib/python3.11/site-packages/sqlalchemy/engine/base.py:2335: in _handle_dbapi_exception
+    raise sqlalchemy_exception.with_traceback(exc_info[2]) from e
+/usr/local/lib/python3.11/site-packages/sqlalchemy/engine/base.py:1960: in _exec_single_context
+    self.dialect.do_execute(
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = <sqlalchemy.dialects.postgresql.psycopg2.PGDialect_psycopg2 object at 0x7f6615bff6d0>
+cursor = <cursor object at 0x7f66106a9210; closed: -1>
+statement = 'INSERT INTO books (title, author, isbn, genre_id, series_id, volume, cover_path, read_status) VALUES (%(title)s, %(author)s, %(isbn)s, %(genre_id)s, %(series_id)s, %(volume)s, %(cover_path)s, %(read_status)s) RETURNING books.id'
+parameters = {'author': 'J. K. Lantern', 'cover_path': 'uploads/fake_cover.jpg', 'genre_id': 1, 'isbn': '9780123456789', ...}
+context = <sqlalchemy.dialects.postgresql.psycopg2.PGExecutionContext_psycopg2 object at 0x7f66106cc650>
+
+    def do_execute(self, cursor, statement, parameters, context=None):
+>       cursor.execute(statement, parameters)
+E       sqlalchemy.exc.IntegrityError: (psycopg2.errors.UniqueViolation) duplicate key value violates unique constraint "books_isbn_key"
+E       DETAIL:  Key (isbn)=(9780123456789) already exists.
+E       
+E       [SQL: INSERT INTO books (title, author, isbn, genre_id, series_id, volume, cover_path, read_status) VALUES (%(title)s, %(author)s, %(isbn)s, %(genre_id)s, %(series_id)s, %(volume)s, %(cover_path)s, %(read_status)s) RETURNING books.id]
+E       [parameters: {'title': 'The Hollow Beacon', 'author': 'J. K. Lantern', 'isbn': '9780123456789', 'genre_id': 1, 'series_id': 1, 'volume': 1, 'cover_path': 'uploads/fake_cover.jpg', 'read_status': None}]
+E       (Background on this error at: https://sqlalche.me/e/20/gkpj)
+
+/usr/local/lib/python3.11/site-packages/sqlalchemy/engine/default.py:924: IntegrityError
+_________________ ERROR at setup of test_update_reading_status _________________
+
+self = <sqlalchemy.engine.base.Connection object at 0x7f6611d60890>
+dialect = <sqlalchemy.dialects.postgresql.psycopg2.PGDialect_psycopg2 object at 0x7f6615bff6d0>
+context = <sqlalchemy.dialects.postgresql.psycopg2.PGExecutionContext_psycopg2 object at 0x7f66106cc650>
+statement = <sqlalchemy.dialects.postgresql.base.PGCompiler object at 0x7f66105d1810>
+parameters = [{'author': 'J. K. Lantern', 'cover_path': 'uploads/fake_cover.jpg', 'genre_id': 1, 'isbn': '9780123456789', ...}]
+
+    def _exec_single_context(
+        self,
+        dialect: Dialect,
+        context: ExecutionContext,
+        statement: Union[str, Compiled],
+        parameters: Optional[_AnyMultiExecuteParams],
+    ) -> CursorResult[Any]:
+        """continue the _execute_context() method for a single DBAPI
+        cursor.execute() or cursor.executemany() call.
+    
+        """
+        if dialect.bind_typing is BindTyping.SETINPUTSIZES:
+            generic_setinputsizes = context._prepare_set_input_sizes()
+    
+            if generic_setinputsizes:
+                try:
+                    dialect.do_set_input_sizes(
+                        context.cursor, generic_setinputsizes, context
+                    )
+                except BaseException as e:
+                    self._handle_dbapi_exception(
+                        e, str(statement), parameters, None, context
+                    )
+    
+        cursor, str_statement, parameters = (
+            context.cursor,
+            context.statement,
+            context.parameters,
+        )
+    
+        effective_parameters: Optional[_AnyExecuteParams]
+    
+        if not context.executemany:
+            effective_parameters = parameters[0]
+        else:
+            effective_parameters = parameters
+    
+        if self._has_events or self.engine._has_events:
+            for fn in self.dispatch.before_cursor_execute:
+                str_statement, effective_parameters = fn(
+                    self,
+                    cursor,
+                    str_statement,
+                    effective_parameters,
+                    context,
+                    context.executemany,
+                )
+    
+        if self._echo:
+            self._log_info(str_statement)
+    
+            stats = context._get_cache_stats()
+    
+            if not self.engine.hide_parameters:
+                self._log_info(
+                    "[%s] %r",
+                    stats,
+                    sql_util._repr_params(
+                        effective_parameters,
+                        batches=10,
+                        ismulti=context.executemany,
+                    ),
+                )
+            else:
+                self._log_info(
+                    "[%s] [SQL parameters hidden due to hide_parameters=True]",
+                    stats,
+                )
+    
+        evt_handled: bool = False
+        try:
+            if context.execute_style is ExecuteStyle.EXECUTEMANY:
+                effective_parameters = cast(
+                    "_CoreMultiExecuteParams", effective_parameters
+                )
+                if self.dialect._has_events:
+                    for fn in self.dialect.dispatch.do_executemany:
+                        if fn(
+                            cursor,
+                            str_statement,
+                            effective_parameters,
+                            context,
+                        ):
+                            evt_handled = True
+                            break
+                if not evt_handled:
+                    self.dialect.do_executemany(
+                        cursor,
+                        str_statement,
+                        effective_parameters,
+                        context,
+                    )
+            elif not effective_parameters and context.no_parameters:
+                if self.dialect._has_events:
+                    for fn in self.dialect.dispatch.do_execute_no_params:
+                        if fn(cursor, str_statement, context):
+                            evt_handled = True
+                            break
+                if not evt_handled:
+                    self.dialect.do_execute_no_params(
+                        cursor, str_statement, context
+                    )
+            else:
+                effective_parameters = cast(
+                    "_CoreSingleExecuteParams", effective_parameters
+                )
+                if self.dialect._has_events:
+                    for fn in self.dialect.dispatch.do_execute:
+                        if fn(
+                            cursor,
+                            str_statement,
+                            effective_parameters,
+                            context,
+                        ):
+                            evt_handled = True
+                            break
+                if not evt_handled:
+>                   self.dialect.do_execute(
+                        cursor, str_statement, effective_parameters, context
+                    )
+
+/usr/local/lib/python3.11/site-packages/sqlalchemy/engine/base.py:1960: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = <sqlalchemy.dialects.postgresql.psycopg2.PGDialect_psycopg2 object at 0x7f6615bff6d0>
+cursor = <cursor object at 0x7f66106a9210; closed: -1>
+statement = 'INSERT INTO books (title, author, isbn, genre_id, series_id, volume, cover_path, read_status) VALUES (%(title)s, %(author)s, %(isbn)s, %(genre_id)s, %(series_id)s, %(volume)s, %(cover_path)s, %(read_status)s) RETURNING books.id'
+parameters = {'author': 'J. K. Lantern', 'cover_path': 'uploads/fake_cover.jpg', 'genre_id': 1, 'isbn': '9780123456789', ...}
+context = <sqlalchemy.dialects.postgresql.psycopg2.PGExecutionContext_psycopg2 object at 0x7f66106cc650>
+
+    def do_execute(self, cursor, statement, parameters, context=None):
+>       cursor.execute(statement, parameters)
+E       psycopg2.errors.UniqueViolation: duplicate key value violates unique constraint "books_isbn_key"
+E       DETAIL:  Key (isbn)=(9780123456789) already exists.
+
+/usr/local/lib/python3.11/site-packages/sqlalchemy/engine/default.py:924: UniqueViolation
+
+The above exception was the direct cause of the following exception:
+
+client = <starlette.testclient.TestClient object at 0x7f66106f8550>
+
+    @pytest.fixture(scope="module")
+    def book_and_user(client):
+        headers = create_admin(client)
+>       book = create_book(client, headers)
+
+tests/test_user_books.py:7: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/test_factory.py:56: in create_book
+    res = client.post("/books/", json=book_data, headers=headers)
+/usr/local/lib/python3.11/site-packages/starlette/testclient.py:608: in post
+    return super().post(
+/usr/local/lib/python3.11/site-packages/httpx/_client.py:1145: in post
+    return self.request(
+/usr/local/lib/python3.11/site-packages/starlette/testclient.py:491: in request
+    return super().request(
+/usr/local/lib/python3.11/site-packages/httpx/_client.py:827: in request
+    return self.send(request, auth=auth, follow_redirects=follow_redirects)
+/usr/local/lib/python3.11/site-packages/httpx/_client.py:914: in send
+    response = self._send_handling_auth(
+/usr/local/lib/python3.11/site-packages/httpx/_client.py:942: in _send_handling_auth
+    response = self._send_handling_redirects(
+/usr/local/lib/python3.11/site-packages/httpx/_client.py:979: in _send_handling_redirects
+    response = self._send_single_request(request)
+/usr/local/lib/python3.11/site-packages/httpx/_client.py:1015: in _send_single_request
+    response = transport.handle_request(request)
+/usr/local/lib/python3.11/site-packages/starlette/testclient.py:372: in handle_request
+    raise exc
+/usr/local/lib/python3.11/site-packages/starlette/testclient.py:369: in handle_request
+    portal.call(self.app, scope, receive, send)
+/usr/local/lib/python3.11/site-packages/anyio/from_thread.py:290: in call
+    return cast(T_Retval, self.start_task_soon(func, *args).result())
+/usr/local/lib/python3.11/concurrent/futures/_base.py:456: in result
+    return self.__get_result()
+/usr/local/lib/python3.11/concurrent/futures/_base.py:401: in __get_result
+    raise self._exception
+/usr/local/lib/python3.11/site-packages/anyio/from_thread.py:221: in _call_func
+    retval = await retval_or_awaitable
+/usr/local/lib/python3.11/site-packages/fastapi/applications.py:1054: in __call__
+    await super().__call__(scope, receive, send)
+/usr/local/lib/python3.11/site-packages/starlette/applications.py:123: in __call__
+    await self.middleware_stack(scope, receive, send)
+/usr/local/lib/python3.11/site-packages/starlette/middleware/errors.py:186: in __call__
+    raise exc
+/usr/local/lib/python3.11/site-packages/starlette/middleware/errors.py:164: in __call__
+    await self.app(scope, receive, _send)
+/usr/local/lib/python3.11/site-packages/starlette/middleware/exceptions.py:62: in __call__
+    await wrap_app_handling_exceptions(self.app, conn)(scope, receive, send)
+/usr/local/lib/python3.11/site-packages/starlette/_exception_handler.py:64: in wrapped_app
+    raise exc
+/usr/local/lib/python3.11/site-packages/starlette/_exception_handler.py:53: in wrapped_app
+    await app(scope, receive, sender)
+/usr/local/lib/python3.11/site-packages/starlette/routing.py:758: in __call__
+    await self.middleware_stack(scope, receive, send)
+/usr/local/lib/python3.11/site-packages/starlette/routing.py:778: in app
+    await route.handle(scope, receive, send)
+/usr/local/lib/python3.11/site-packages/starlette/routing.py:299: in handle
+    await self.app(scope, receive, send)
+/usr/local/lib/python3.11/site-packages/starlette/routing.py:79: in app
+    await wrap_app_handling_exceptions(app, request)(scope, receive, send)
+/usr/local/lib/python3.11/site-packages/starlette/_exception_handler.py:64: in wrapped_app
+    raise exc
+/usr/local/lib/python3.11/site-packages/starlette/_exception_handler.py:53: in wrapped_app
+    await app(scope, receive, sender)
+/usr/local/lib/python3.11/site-packages/starlette/routing.py:74: in app
+    response = await func(request)
+/usr/local/lib/python3.11/site-packages/fastapi/routing.py:278: in app
+    raw_response = await run_endpoint_function(
+/usr/local/lib/python3.11/site-packages/fastapi/routing.py:193: in run_endpoint_function
+    return await run_in_threadpool(dependant.call, **values)
+/usr/local/lib/python3.11/site-packages/starlette/concurrency.py:42: in run_in_threadpool
+    return await anyio.to_thread.run_sync(func, *args)
+/usr/local/lib/python3.11/site-packages/anyio/to_thread.py:56: in run_sync
+    return await get_async_backend().run_sync_in_worker_thread(
+/usr/local/lib/python3.11/site-packages/anyio/_backends/_asyncio.py:2470: in run_sync_in_worker_thread
+    return await future
+/usr/local/lib/python3.11/site-packages/anyio/_backends/_asyncio.py:967: in run
+    result = context.run(func, *args)
+app/routers/books.py:58: in create_book
+    db.commit()
+/usr/local/lib/python3.11/site-packages/sqlalchemy/orm/session.py:1972: in commit
+    trans.commit(_to_root=True)
+<string>:2: in commit
+    ???
+/usr/local/lib/python3.11/site-packages/sqlalchemy/orm/state_changes.py:139: in _go
+    ret_value = fn(self, *arg, **kw)
+/usr/local/lib/python3.11/site-packages/sqlalchemy/orm/session.py:1257: in commit
+    self._prepare_impl()
+<string>:2: in _prepare_impl
+    ???
+/usr/local/lib/python3.11/site-packages/sqlalchemy/orm/state_changes.py:139: in _go
+    ret_value = fn(self, *arg, **kw)
+/usr/local/lib/python3.11/site-packages/sqlalchemy/orm/session.py:1232: in _prepare_impl
+    self.session.flush()
+/usr/local/lib/python3.11/site-packages/sqlalchemy/orm/session.py:4296: in flush
+    self._flush(objects)
+/usr/local/lib/python3.11/site-packages/sqlalchemy/orm/session.py:4431: in _flush
+    with util.safe_reraise():
+/usr/local/lib/python3.11/site-packages/sqlalchemy/util/langhelpers.py:146: in __exit__
+    raise exc_value.with_traceback(exc_tb)
+/usr/local/lib/python3.11/site-packages/sqlalchemy/orm/session.py:4392: in _flush
+    flush_context.execute()
+/usr/local/lib/python3.11/site-packages/sqlalchemy/orm/unitofwork.py:466: in execute
+    rec.execute(self)
+/usr/local/lib/python3.11/site-packages/sqlalchemy/orm/unitofwork.py:642: in execute
+    util.preloaded.orm_persistence.save_obj(
+/usr/local/lib/python3.11/site-packages/sqlalchemy/orm/persistence.py:93: in save_obj
+    _emit_insert_statements(
+/usr/local/lib/python3.11/site-packages/sqlalchemy/orm/persistence.py:1233: in _emit_insert_statements
+    result = connection.execute(
+/usr/local/lib/python3.11/site-packages/sqlalchemy/engine/base.py:1408: in execute
+    return meth(
+/usr/local/lib/python3.11/site-packages/sqlalchemy/sql/elements.py:513: in _execute_on_connection
+    return connection._execute_clauseelement(
+/usr/local/lib/python3.11/site-packages/sqlalchemy/engine/base.py:1630: in _execute_clauseelement
+    ret = self._execute_context(
+/usr/local/lib/python3.11/site-packages/sqlalchemy/engine/base.py:1839: in _execute_context
+    return self._exec_single_context(
+/usr/local/lib/python3.11/site-packages/sqlalchemy/engine/base.py:1979: in _exec_single_context
+    self._handle_dbapi_exception(
+/usr/local/lib/python3.11/site-packages/sqlalchemy/engine/base.py:2335: in _handle_dbapi_exception
+    raise sqlalchemy_exception.with_traceback(exc_info[2]) from e
+/usr/local/lib/python3.11/site-packages/sqlalchemy/engine/base.py:1960: in _exec_single_context
+    self.dialect.do_execute(
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = <sqlalchemy.dialects.postgresql.psycopg2.PGDialect_psycopg2 object at 0x7f6615bff6d0>
+cursor = <cursor object at 0x7f66106a9210; closed: -1>
+statement = 'INSERT INTO books (title, author, isbn, genre_id, series_id, volume, cover_path, read_status) VALUES (%(title)s, %(author)s, %(isbn)s, %(genre_id)s, %(series_id)s, %(volume)s, %(cover_path)s, %(read_status)s) RETURNING books.id'
+parameters = {'author': 'J. K. Lantern', 'cover_path': 'uploads/fake_cover.jpg', 'genre_id': 1, 'isbn': '9780123456789', ...}
+context = <sqlalchemy.dialects.postgresql.psycopg2.PGExecutionContext_psycopg2 object at 0x7f66106cc650>
+
+    def do_execute(self, cursor, statement, parameters, context=None):
+>       cursor.execute(statement, parameters)
+E       sqlalchemy.exc.IntegrityError: (psycopg2.errors.UniqueViolation) duplicate key value violates unique constraint "books_isbn_key"
+E       DETAIL:  Key (isbn)=(9780123456789) already exists.
+E       
+E       [SQL: INSERT INTO books (title, author, isbn, genre_id, series_id, volume, cover_path, read_status) VALUES (%(title)s, %(author)s, %(isbn)s, %(genre_id)s, %(series_id)s, %(volume)s, %(cover_path)s, %(read_status)s) RETURNING books.id]
+E       [parameters: {'title': 'The Hollow Beacon', 'author': 'J. K. Lantern', 'isbn': '9780123456789', 'genre_id': 1, 'series_id': 1, 'volume': 1, 'cover_path': 'uploads/fake_cover.jpg', 'read_status': None}]
+E       (Background on this error at: https://sqlalche.me/e/20/gkpj)
+
+/usr/local/lib/python3.11/site-packages/sqlalchemy/engine/default.py:924: IntegrityError
+_________________ ERROR at setup of test_list_reading_statuses _________________
+
+self = <sqlalchemy.engine.base.Connection object at 0x7f6611d60890>
+dialect = <sqlalchemy.dialects.postgresql.psycopg2.PGDialect_psycopg2 object at 0x7f6615bff6d0>
+context = <sqlalchemy.dialects.postgresql.psycopg2.PGExecutionContext_psycopg2 object at 0x7f66106cc650>
+statement = <sqlalchemy.dialects.postgresql.base.PGCompiler object at 0x7f66105d1810>
+parameters = [{'author': 'J. K. Lantern', 'cover_path': 'uploads/fake_cover.jpg', 'genre_id': 1, 'isbn': '9780123456789', ...}]
+
+    def _exec_single_context(
+        self,
+        dialect: Dialect,
+        context: ExecutionContext,
+        statement: Union[str, Compiled],
+        parameters: Optional[_AnyMultiExecuteParams],
+    ) -> CursorResult[Any]:
+        """continue the _execute_context() method for a single DBAPI
+        cursor.execute() or cursor.executemany() call.
+    
+        """
+        if dialect.bind_typing is BindTyping.SETINPUTSIZES:
+            generic_setinputsizes = context._prepare_set_input_sizes()
+    
+            if generic_setinputsizes:
+                try:
+                    dialect.do_set_input_sizes(
+                        context.cursor, generic_setinputsizes, context
+                    )
+                except BaseException as e:
+                    self._handle_dbapi_exception(
+                        e, str(statement), parameters, None, context
+                    )
+    
+        cursor, str_statement, parameters = (
+            context.cursor,
+            context.statement,
+            context.parameters,
+        )
+    
+        effective_parameters: Optional[_AnyExecuteParams]
+    
+        if not context.executemany:
+            effective_parameters = parameters[0]
+        else:
+            effective_parameters = parameters
+    
+        if self._has_events or self.engine._has_events:
+            for fn in self.dispatch.before_cursor_execute:
+                str_statement, effective_parameters = fn(
+                    self,
+                    cursor,
+                    str_statement,
+                    effective_parameters,
+                    context,
+                    context.executemany,
+                )
+    
+        if self._echo:
+            self._log_info(str_statement)
+    
+            stats = context._get_cache_stats()
+    
+            if not self.engine.hide_parameters:
+                self._log_info(
+                    "[%s] %r",
+                    stats,
+                    sql_util._repr_params(
+                        effective_parameters,
+                        batches=10,
+                        ismulti=context.executemany,
+                    ),
+                )
+            else:
+                self._log_info(
+                    "[%s] [SQL parameters hidden due to hide_parameters=True]",
+                    stats,
+                )
+    
+        evt_handled: bool = False
+        try:
+            if context.execute_style is ExecuteStyle.EXECUTEMANY:
+                effective_parameters = cast(
+                    "_CoreMultiExecuteParams", effective_parameters
+                )
+                if self.dialect._has_events:
+                    for fn in self.dialect.dispatch.do_executemany:
+                        if fn(
+                            cursor,
+                            str_statement,
+                            effective_parameters,
+                            context,
+                        ):
+                            evt_handled = True
+                            break
+                if not evt_handled:
+                    self.dialect.do_executemany(
+                        cursor,
+                        str_statement,
+                        effective_parameters,
+                        context,
+                    )
+            elif not effective_parameters and context.no_parameters:
+                if self.dialect._has_events:
+                    for fn in self.dialect.dispatch.do_execute_no_params:
+                        if fn(cursor, str_statement, context):
+                            evt_handled = True
+                            break
+                if not evt_handled:
+                    self.dialect.do_execute_no_params(
+                        cursor, str_statement, context
+                    )
+            else:
+                effective_parameters = cast(
+                    "_CoreSingleExecuteParams", effective_parameters
+                )
+                if self.dialect._has_events:
+                    for fn in self.dialect.dispatch.do_execute:
+                        if fn(
+                            cursor,
+                            str_statement,
+                            effective_parameters,
+                            context,
+                        ):
+                            evt_handled = True
+                            break
+                if not evt_handled:
+>                   self.dialect.do_execute(
+                        cursor, str_statement, effective_parameters, context
+                    )
+
+/usr/local/lib/python3.11/site-packages/sqlalchemy/engine/base.py:1960: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = <sqlalchemy.dialects.postgresql.psycopg2.PGDialect_psycopg2 object at 0x7f6615bff6d0>
+cursor = <cursor object at 0x7f66106a9210; closed: -1>
+statement = 'INSERT INTO books (title, author, isbn, genre_id, series_id, volume, cover_path, read_status) VALUES (%(title)s, %(author)s, %(isbn)s, %(genre_id)s, %(series_id)s, %(volume)s, %(cover_path)s, %(read_status)s) RETURNING books.id'
+parameters = {'author': 'J. K. Lantern', 'cover_path': 'uploads/fake_cover.jpg', 'genre_id': 1, 'isbn': '9780123456789', ...}
+context = <sqlalchemy.dialects.postgresql.psycopg2.PGExecutionContext_psycopg2 object at 0x7f66106cc650>
+
+    def do_execute(self, cursor, statement, parameters, context=None):
+>       cursor.execute(statement, parameters)
+E       psycopg2.errors.UniqueViolation: duplicate key value violates unique constraint "books_isbn_key"
+E       DETAIL:  Key (isbn)=(9780123456789) already exists.
+
+/usr/local/lib/python3.11/site-packages/sqlalchemy/engine/default.py:924: UniqueViolation
+
+The above exception was the direct cause of the following exception:
+
+client = <starlette.testclient.TestClient object at 0x7f66106f8550>
+
+    @pytest.fixture(scope="module")
+    def book_and_user(client):
+        headers = create_admin(client)
+>       book = create_book(client, headers)
+
+tests/test_user_books.py:7: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/test_factory.py:56: in create_book
+    res = client.post("/books/", json=book_data, headers=headers)
+/usr/local/lib/python3.11/site-packages/starlette/testclient.py:608: in post
+    return super().post(
+/usr/local/lib/python3.11/site-packages/httpx/_client.py:1145: in post
+    return self.request(
+/usr/local/lib/python3.11/site-packages/starlette/testclient.py:491: in request
+    return super().request(
+/usr/local/lib/python3.11/site-packages/httpx/_client.py:827: in request
+    return self.send(request, auth=auth, follow_redirects=follow_redirects)
+/usr/local/lib/python3.11/site-packages/httpx/_client.py:914: in send
+    response = self._send_handling_auth(
+/usr/local/lib/python3.11/site-packages/httpx/_client.py:942: in _send_handling_auth
+    response = self._send_handling_redirects(
+/usr/local/lib/python3.11/site-packages/httpx/_client.py:979: in _send_handling_redirects
+    response = self._send_single_request(request)
+/usr/local/lib/python3.11/site-packages/httpx/_client.py:1015: in _send_single_request
+    response = transport.handle_request(request)
+/usr/local/lib/python3.11/site-packages/starlette/testclient.py:372: in handle_request
+    raise exc
+/usr/local/lib/python3.11/site-packages/starlette/testclient.py:369: in handle_request
+    portal.call(self.app, scope, receive, send)
+/usr/local/lib/python3.11/site-packages/anyio/from_thread.py:290: in call
+    return cast(T_Retval, self.start_task_soon(func, *args).result())
+/usr/local/lib/python3.11/concurrent/futures/_base.py:456: in result
+    return self.__get_result()
+/usr/local/lib/python3.11/concurrent/futures/_base.py:401: in __get_result
+    raise self._exception
+/usr/local/lib/python3.11/site-packages/anyio/from_thread.py:221: in _call_func
+    retval = await retval_or_awaitable
+/usr/local/lib/python3.11/site-packages/fastapi/applications.py:1054: in __call__
+    await super().__call__(scope, receive, send)
+/usr/local/lib/python3.11/site-packages/starlette/applications.py:123: in __call__
+    await self.middleware_stack(scope, receive, send)
+/usr/local/lib/python3.11/site-packages/starlette/middleware/errors.py:186: in __call__
+    raise exc
+/usr/local/lib/python3.11/site-packages/starlette/middleware/errors.py:164: in __call__
+    await self.app(scope, receive, _send)
+/usr/local/lib/python3.11/site-packages/starlette/middleware/exceptions.py:62: in __call__
+    await wrap_app_handling_exceptions(self.app, conn)(scope, receive, send)
+/usr/local/lib/python3.11/site-packages/starlette/_exception_handler.py:64: in wrapped_app
+    raise exc
+/usr/local/lib/python3.11/site-packages/starlette/_exception_handler.py:53: in wrapped_app
+    await app(scope, receive, sender)
+/usr/local/lib/python3.11/site-packages/starlette/routing.py:758: in __call__
+    await self.middleware_stack(scope, receive, send)
+/usr/local/lib/python3.11/site-packages/starlette/routing.py:778: in app
+    await route.handle(scope, receive, send)
+/usr/local/lib/python3.11/site-packages/starlette/routing.py:299: in handle
+    await self.app(scope, receive, send)
+/usr/local/lib/python3.11/site-packages/starlette/routing.py:79: in app
+    await wrap_app_handling_exceptions(app, request)(scope, receive, send)
+/usr/local/lib/python3.11/site-packages/starlette/_exception_handler.py:64: in wrapped_app
+    raise exc
+/usr/local/lib/python3.11/site-packages/starlette/_exception_handler.py:53: in wrapped_app
+    await app(scope, receive, sender)
+/usr/local/lib/python3.11/site-packages/starlette/routing.py:74: in app
+    response = await func(request)
+/usr/local/lib/python3.11/site-packages/fastapi/routing.py:278: in app
+    raw_response = await run_endpoint_function(
+/usr/local/lib/python3.11/site-packages/fastapi/routing.py:193: in run_endpoint_function
+    return await run_in_threadpool(dependant.call, **values)
+/usr/local/lib/python3.11/site-packages/starlette/concurrency.py:42: in run_in_threadpool
+    return await anyio.to_thread.run_sync(func, *args)
+/usr/local/lib/python3.11/site-packages/anyio/to_thread.py:56: in run_sync
+    return await get_async_backend().run_sync_in_worker_thread(
+/usr/local/lib/python3.11/site-packages/anyio/_backends/_asyncio.py:2470: in run_sync_in_worker_thread
+    return await future
+/usr/local/lib/python3.11/site-packages/anyio/_backends/_asyncio.py:967: in run
+    result = context.run(func, *args)
+app/routers/books.py:58: in create_book
+    db.commit()
+/usr/local/lib/python3.11/site-packages/sqlalchemy/orm/session.py:1972: in commit
+    trans.commit(_to_root=True)
+<string>:2: in commit
+    ???
+/usr/local/lib/python3.11/site-packages/sqlalchemy/orm/state_changes.py:139: in _go
+    ret_value = fn(self, *arg, **kw)
+/usr/local/lib/python3.11/site-packages/sqlalchemy/orm/session.py:1257: in commit
+    self._prepare_impl()
+<string>:2: in _prepare_impl
+    ???
+/usr/local/lib/python3.11/site-packages/sqlalchemy/orm/state_changes.py:139: in _go
+    ret_value = fn(self, *arg, **kw)
+/usr/local/lib/python3.11/site-packages/sqlalchemy/orm/session.py:1232: in _prepare_impl
+    self.session.flush()
+/usr/local/lib/python3.11/site-packages/sqlalchemy/orm/session.py:4296: in flush
+    self._flush(objects)
+/usr/local/lib/python3.11/site-packages/sqlalchemy/orm/session.py:4431: in _flush
+    with util.safe_reraise():
+/usr/local/lib/python3.11/site-packages/sqlalchemy/util/langhelpers.py:146: in __exit__
+    raise exc_value.with_traceback(exc_tb)
+/usr/local/lib/python3.11/site-packages/sqlalchemy/orm/session.py:4392: in _flush
+    flush_context.execute()
+/usr/local/lib/python3.11/site-packages/sqlalchemy/orm/unitofwork.py:466: in execute
+    rec.execute(self)
+/usr/local/lib/python3.11/site-packages/sqlalchemy/orm/unitofwork.py:642: in execute
+    util.preloaded.orm_persistence.save_obj(
+/usr/local/lib/python3.11/site-packages/sqlalchemy/orm/persistence.py:93: in save_obj
+    _emit_insert_statements(
+/usr/local/lib/python3.11/site-packages/sqlalchemy/orm/persistence.py:1233: in _emit_insert_statements
+    result = connection.execute(
+/usr/local/lib/python3.11/site-packages/sqlalchemy/engine/base.py:1408: in execute
+    return meth(
+/usr/local/lib/python3.11/site-packages/sqlalchemy/sql/elements.py:513: in _execute_on_connection
+    return connection._execute_clauseelement(
+/usr/local/lib/python3.11/site-packages/sqlalchemy/engine/base.py:1630: in _execute_clauseelement
+    ret = self._execute_context(
+/usr/local/lib/python3.11/site-packages/sqlalchemy/engine/base.py:1839: in _execute_context
+    return self._exec_single_context(
+/usr/local/lib/python3.11/site-packages/sqlalchemy/engine/base.py:1979: in _exec_single_context
+    self._handle_dbapi_exception(
+/usr/local/lib/python3.11/site-packages/sqlalchemy/engine/base.py:2335: in _handle_dbapi_exception
+    raise sqlalchemy_exception.with_traceback(exc_info[2]) from e
+/usr/local/lib/python3.11/site-packages/sqlalchemy/engine/base.py:1960: in _exec_single_context
+    self.dialect.do_execute(
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = <sqlalchemy.dialects.postgresql.psycopg2.PGDialect_psycopg2 object at 0x7f6615bff6d0>
+cursor = <cursor object at 0x7f66106a9210; closed: -1>
+statement = 'INSERT INTO books (title, author, isbn, genre_id, series_id, volume, cover_path, read_status) VALUES (%(title)s, %(author)s, %(isbn)s, %(genre_id)s, %(series_id)s, %(volume)s, %(cover_path)s, %(read_status)s) RETURNING books.id'
+parameters = {'author': 'J. K. Lantern', 'cover_path': 'uploads/fake_cover.jpg', 'genre_id': 1, 'isbn': '9780123456789', ...}
+context = <sqlalchemy.dialects.postgresql.psycopg2.PGExecutionContext_psycopg2 object at 0x7f66106cc650>
+
+    def do_execute(self, cursor, statement, parameters, context=None):
+>       cursor.execute(statement, parameters)
+E       sqlalchemy.exc.IntegrityError: (psycopg2.errors.UniqueViolation) duplicate key value violates unique constraint "books_isbn_key"
+E       DETAIL:  Key (isbn)=(9780123456789) already exists.
+E       
+E       [SQL: INSERT INTO books (title, author, isbn, genre_id, series_id, volume, cover_path, read_status) VALUES (%(title)s, %(author)s, %(isbn)s, %(genre_id)s, %(series_id)s, %(volume)s, %(cover_path)s, %(read_status)s) RETURNING books.id]
+E       [parameters: {'title': 'The Hollow Beacon', 'author': 'J. K. Lantern', 'isbn': '9780123456789', 'genre_id': 1, 'series_id': 1, 'volume': 1, 'cover_path': 'uploads/fake_cover.jpg', 'read_status': None}]
+E       (Background on this error at: https://sqlalche.me/e/20/gkpj)
+
+/usr/local/lib/python3.11/site-packages/sqlalchemy/engine/default.py:924: IntegrityError
+_________________ ERROR at setup of test_delete_reading_status _________________
+
+self = <sqlalchemy.engine.base.Connection object at 0x7f6611d60890>
+dialect = <sqlalchemy.dialects.postgresql.psycopg2.PGDialect_psycopg2 object at 0x7f6615bff6d0>
+context = <sqlalchemy.dialects.postgresql.psycopg2.PGExecutionContext_psycopg2 object at 0x7f66106cc650>
+statement = <sqlalchemy.dialects.postgresql.base.PGCompiler object at 0x7f66105d1810>
+parameters = [{'author': 'J. K. Lantern', 'cover_path': 'uploads/fake_cover.jpg', 'genre_id': 1, 'isbn': '9780123456789', ...}]
+
+    def _exec_single_context(
+        self,
+        dialect: Dialect,
+        context: ExecutionContext,
+        statement: Union[str, Compiled],
+        parameters: Optional[_AnyMultiExecuteParams],
+    ) -> CursorResult[Any]:
+        """continue the _execute_context() method for a single DBAPI
+        cursor.execute() or cursor.executemany() call.
+    
+        """
+        if dialect.bind_typing is BindTyping.SETINPUTSIZES:
+            generic_setinputsizes = context._prepare_set_input_sizes()
+    
+            if generic_setinputsizes:
+                try:
+                    dialect.do_set_input_sizes(
+                        context.cursor, generic_setinputsizes, context
+                    )
+                except BaseException as e:
+                    self._handle_dbapi_exception(
+                        e, str(statement), parameters, None, context
+                    )
+    
+        cursor, str_statement, parameters = (
+            context.cursor,
+            context.statement,
+            context.parameters,
+        )
+    
+        effective_parameters: Optional[_AnyExecuteParams]
+    
+        if not context.executemany:
+            effective_parameters = parameters[0]
+        else:
+            effective_parameters = parameters
+    
+        if self._has_events or self.engine._has_events:
+            for fn in self.dispatch.before_cursor_execute:
+                str_statement, effective_parameters = fn(
+                    self,
+                    cursor,
+                    str_statement,
+                    effective_parameters,
+                    context,
+                    context.executemany,
+                )
+    
+        if self._echo:
+            self._log_info(str_statement)
+    
+            stats = context._get_cache_stats()
+    
+            if not self.engine.hide_parameters:
+                self._log_info(
+                    "[%s] %r",
+                    stats,
+                    sql_util._repr_params(
+                        effective_parameters,
+                        batches=10,
+                        ismulti=context.executemany,
+                    ),
+                )
+            else:
+                self._log_info(
+                    "[%s] [SQL parameters hidden due to hide_parameters=True]",
+                    stats,
+                )
+    
+        evt_handled: bool = False
+        try:
+            if context.execute_style is ExecuteStyle.EXECUTEMANY:
+                effective_parameters = cast(
+                    "_CoreMultiExecuteParams", effective_parameters
+                )
+                if self.dialect._has_events:
+                    for fn in self.dialect.dispatch.do_executemany:
+                        if fn(
+                            cursor,
+                            str_statement,
+                            effective_parameters,
+                            context,
+                        ):
+                            evt_handled = True
+                            break
+                if not evt_handled:
+                    self.dialect.do_executemany(
+                        cursor,
+                        str_statement,
+                        effective_parameters,
+                        context,
+                    )
+            elif not effective_parameters and context.no_parameters:
+                if self.dialect._has_events:
+                    for fn in self.dialect.dispatch.do_execute_no_params:
+                        if fn(cursor, str_statement, context):
+                            evt_handled = True
+                            break
+                if not evt_handled:
+                    self.dialect.do_execute_no_params(
+                        cursor, str_statement, context
+                    )
+            else:
+                effective_parameters = cast(
+                    "_CoreSingleExecuteParams", effective_parameters
+                )
+                if self.dialect._has_events:
+                    for fn in self.dialect.dispatch.do_execute:
+                        if fn(
+                            cursor,
+                            str_statement,
+                            effective_parameters,
+                            context,
+                        ):
+                            evt_handled = True
+                            break
+                if not evt_handled:
+>                   self.dialect.do_execute(
+                        cursor, str_statement, effective_parameters, context
+                    )
+
+/usr/local/lib/python3.11/site-packages/sqlalchemy/engine/base.py:1960: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = <sqlalchemy.dialects.postgresql.psycopg2.PGDialect_psycopg2 object at 0x7f6615bff6d0>
+cursor = <cursor object at 0x7f66106a9210; closed: -1>
+statement = 'INSERT INTO books (title, author, isbn, genre_id, series_id, volume, cover_path, read_status) VALUES (%(title)s, %(author)s, %(isbn)s, %(genre_id)s, %(series_id)s, %(volume)s, %(cover_path)s, %(read_status)s) RETURNING books.id'
+parameters = {'author': 'J. K. Lantern', 'cover_path': 'uploads/fake_cover.jpg', 'genre_id': 1, 'isbn': '9780123456789', ...}
+context = <sqlalchemy.dialects.postgresql.psycopg2.PGExecutionContext_psycopg2 object at 0x7f66106cc650>
+
+    def do_execute(self, cursor, statement, parameters, context=None):
+>       cursor.execute(statement, parameters)
+E       psycopg2.errors.UniqueViolation: duplicate key value violates unique constraint "books_isbn_key"
+E       DETAIL:  Key (isbn)=(9780123456789) already exists.
+
+/usr/local/lib/python3.11/site-packages/sqlalchemy/engine/default.py:924: UniqueViolation
+
+The above exception was the direct cause of the following exception:
+
+client = <starlette.testclient.TestClient object at 0x7f66106f8550>
+
+    @pytest.fixture(scope="module")
+    def book_and_user(client):
+        headers = create_admin(client)
+>       book = create_book(client, headers)
+
+tests/test_user_books.py:7: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/test_factory.py:56: in create_book
+    res = client.post("/books/", json=book_data, headers=headers)
+/usr/local/lib/python3.11/site-packages/starlette/testclient.py:608: in post
+    return super().post(
+/usr/local/lib/python3.11/site-packages/httpx/_client.py:1145: in post
+    return self.request(
+/usr/local/lib/python3.11/site-packages/starlette/testclient.py:491: in request
+    return super().request(
+/usr/local/lib/python3.11/site-packages/httpx/_client.py:827: in request
+    return self.send(request, auth=auth, follow_redirects=follow_redirects)
+/usr/local/lib/python3.11/site-packages/httpx/_client.py:914: in send
+    response = self._send_handling_auth(
+/usr/local/lib/python3.11/site-packages/httpx/_client.py:942: in _send_handling_auth
+    response = self._send_handling_redirects(
+/usr/local/lib/python3.11/site-packages/httpx/_client.py:979: in _send_handling_redirects
+    response = self._send_single_request(request)
+/usr/local/lib/python3.11/site-packages/httpx/_client.py:1015: in _send_single_request
+    response = transport.handle_request(request)
+/usr/local/lib/python3.11/site-packages/starlette/testclient.py:372: in handle_request
+    raise exc
+/usr/local/lib/python3.11/site-packages/starlette/testclient.py:369: in handle_request
+    portal.call(self.app, scope, receive, send)
+/usr/local/lib/python3.11/site-packages/anyio/from_thread.py:290: in call
+    return cast(T_Retval, self.start_task_soon(func, *args).result())
+/usr/local/lib/python3.11/concurrent/futures/_base.py:456: in result
+    return self.__get_result()
+/usr/local/lib/python3.11/concurrent/futures/_base.py:401: in __get_result
+    raise self._exception
+/usr/local/lib/python3.11/site-packages/anyio/from_thread.py:221: in _call_func
+    retval = await retval_or_awaitable
+/usr/local/lib/python3.11/site-packages/fastapi/applications.py:1054: in __call__
+    await super().__call__(scope, receive, send)
+/usr/local/lib/python3.11/site-packages/starlette/applications.py:123: in __call__
+    await self.middleware_stack(scope, receive, send)
+/usr/local/lib/python3.11/site-packages/starlette/middleware/errors.py:186: in __call__
+    raise exc
+/usr/local/lib/python3.11/site-packages/starlette/middleware/errors.py:164: in __call__
+    await self.app(scope, receive, _send)
+/usr/local/lib/python3.11/site-packages/starlette/middleware/exceptions.py:62: in __call__
+    await wrap_app_handling_exceptions(self.app, conn)(scope, receive, send)
+/usr/local/lib/python3.11/site-packages/starlette/_exception_handler.py:64: in wrapped_app
+    raise exc
+/usr/local/lib/python3.11/site-packages/starlette/_exception_handler.py:53: in wrapped_app
+    await app(scope, receive, sender)
+/usr/local/lib/python3.11/site-packages/starlette/routing.py:758: in __call__
+    await self.middleware_stack(scope, receive, send)
+/usr/local/lib/python3.11/site-packages/starlette/routing.py:778: in app
+    await route.handle(scope, receive, send)
+/usr/local/lib/python3.11/site-packages/starlette/routing.py:299: in handle
+    await self.app(scope, receive, send)
+/usr/local/lib/python3.11/site-packages/starlette/routing.py:79: in app
+    await wrap_app_handling_exceptions(app, request)(scope, receive, send)
+/usr/local/lib/python3.11/site-packages/starlette/_exception_handler.py:64: in wrapped_app
+    raise exc
+/usr/local/lib/python3.11/site-packages/starlette/_exception_handler.py:53: in wrapped_app
+    await app(scope, receive, sender)
+/usr/local/lib/python3.11/site-packages/starlette/routing.py:74: in app
+    response = await func(request)
+/usr/local/lib/python3.11/site-packages/fastapi/routing.py:278: in app
+    raw_response = await run_endpoint_function(
+/usr/local/lib/python3.11/site-packages/fastapi/routing.py:193: in run_endpoint_function
+    return await run_in_threadpool(dependant.call, **values)
+/usr/local/lib/python3.11/site-packages/starlette/concurrency.py:42: in run_in_threadpool
+    return await anyio.to_thread.run_sync(func, *args)
+/usr/local/lib/python3.11/site-packages/anyio/to_thread.py:56: in run_sync
+    return await get_async_backend().run_sync_in_worker_thread(
+/usr/local/lib/python3.11/site-packages/anyio/_backends/_asyncio.py:2470: in run_sync_in_worker_thread
+    return await future
+/usr/local/lib/python3.11/site-packages/anyio/_backends/_asyncio.py:967: in run
+    result = context.run(func, *args)
+app/routers/books.py:58: in create_book
+    db.commit()
+/usr/local/lib/python3.11/site-packages/sqlalchemy/orm/session.py:1972: in commit
+    trans.commit(_to_root=True)
+<string>:2: in commit
+    ???
+/usr/local/lib/python3.11/site-packages/sqlalchemy/orm/state_changes.py:139: in _go
+    ret_value = fn(self, *arg, **kw)
+/usr/local/lib/python3.11/site-packages/sqlalchemy/orm/session.py:1257: in commit
+    self._prepare_impl()
+<string>:2: in _prepare_impl
+    ???
+/usr/local/lib/python3.11/site-packages/sqlalchemy/orm/state_changes.py:139: in _go
+    ret_value = fn(self, *arg, **kw)
+/usr/local/lib/python3.11/site-packages/sqlalchemy/orm/session.py:1232: in _prepare_impl
+    self.session.flush()
+/usr/local/lib/python3.11/site-packages/sqlalchemy/orm/session.py:4296: in flush
+    self._flush(objects)
+/usr/local/lib/python3.11/site-packages/sqlalchemy/orm/session.py:4431: in _flush
+    with util.safe_reraise():
+/usr/local/lib/python3.11/site-packages/sqlalchemy/util/langhelpers.py:146: in __exit__
+    raise exc_value.with_traceback(exc_tb)
+/usr/local/lib/python3.11/site-packages/sqlalchemy/orm/session.py:4392: in _flush
+    flush_context.execute()
+/usr/local/lib/python3.11/site-packages/sqlalchemy/orm/unitofwork.py:466: in execute
+    rec.execute(self)
+/usr/local/lib/python3.11/site-packages/sqlalchemy/orm/unitofwork.py:642: in execute
+    util.preloaded.orm_persistence.save_obj(
+/usr/local/lib/python3.11/site-packages/sqlalchemy/orm/persistence.py:93: in save_obj
+    _emit_insert_statements(
+/usr/local/lib/python3.11/site-packages/sqlalchemy/orm/persistence.py:1233: in _emit_insert_statements
+    result = connection.execute(
+/usr/local/lib/python3.11/site-packages/sqlalchemy/engine/base.py:1408: in execute
+    return meth(
+/usr/local/lib/python3.11/site-packages/sqlalchemy/sql/elements.py:513: in _execute_on_connection
+    return connection._execute_clauseelement(
+/usr/local/lib/python3.11/site-packages/sqlalchemy/engine/base.py:1630: in _execute_clauseelement
+    ret = self._execute_context(
+/usr/local/lib/python3.11/site-packages/sqlalchemy/engine/base.py:1839: in _execute_context
+    return self._exec_single_context(
+/usr/local/lib/python3.11/site-packages/sqlalchemy/engine/base.py:1979: in _exec_single_context
+    self._handle_dbapi_exception(
+/usr/local/lib/python3.11/site-packages/sqlalchemy/engine/base.py:2335: in _handle_dbapi_exception
+    raise sqlalchemy_exception.with_traceback(exc_info[2]) from e
+/usr/local/lib/python3.11/site-packages/sqlalchemy/engine/base.py:1960: in _exec_single_context
+    self.dialect.do_execute(
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = <sqlalchemy.dialects.postgresql.psycopg2.PGDialect_psycopg2 object at 0x7f6615bff6d0>
+cursor = <cursor object at 0x7f66106a9210; closed: -1>
+statement = 'INSERT INTO books (title, author, isbn, genre_id, series_id, volume, cover_path, read_status) VALUES (%(title)s, %(author)s, %(isbn)s, %(genre_id)s, %(series_id)s, %(volume)s, %(cover_path)s, %(read_status)s) RETURNING books.id'
+parameters = {'author': 'J. K. Lantern', 'cover_path': 'uploads/fake_cover.jpg', 'genre_id': 1, 'isbn': '9780123456789', ...}
+context = <sqlalchemy.dialects.postgresql.psycopg2.PGExecutionContext_psycopg2 object at 0x7f66106cc650>
+
+    def do_execute(self, cursor, statement, parameters, context=None):
+>       cursor.execute(statement, parameters)
+E       sqlalchemy.exc.IntegrityError: (psycopg2.errors.UniqueViolation) duplicate key value violates unique constraint "books_isbn_key"
+E       DETAIL:  Key (isbn)=(9780123456789) already exists.
+E       
+E       [SQL: INSERT INTO books (title, author, isbn, genre_id, series_id, volume, cover_path, read_status) VALUES (%(title)s, %(author)s, %(isbn)s, %(genre_id)s, %(series_id)s, %(volume)s, %(cover_path)s, %(read_status)s) RETURNING books.id]
+E       [parameters: {'title': 'The Hollow Beacon', 'author': 'J. K. Lantern', 'isbn': '9780123456789', 'genre_id': 1, 'series_id': 1, 'volume': 1, 'cover_path': 'uploads/fake_cover.jpg', 'read_status': None}]
+E       (Background on this error at: https://sqlalche.me/e/20/gkpj)
+
+/usr/local/lib/python3.11/site-packages/sqlalchemy/engine/default.py:924: IntegrityError
+=================================== FAILURES ===================================
+_______________________________ test_update_book _______________________________
+
+self = <sqlalchemy.engine.base.Connection object at 0x7f6610667790>
+dialect = <sqlalchemy.dialects.postgresql.psycopg2.PGDialect_psycopg2 object at 0x7f6615bff6d0>
+context = <sqlalchemy.dialects.postgresql.psycopg2.PGExecutionContext_psycopg2 object at 0x7f6610670150>
+statement = <sqlalchemy.dialects.postgresql.base.PGCompiler object at 0x7f66105d1810>
+parameters = [{'author': 'J. K. Lantern', 'cover_path': 'uploads/fake_cover.jpg', 'genre_id': 1, 'isbn': '9780123456789', ...}]
+
+    def _exec_single_context(
+        self,
+        dialect: Dialect,
+        context: ExecutionContext,
+        statement: Union[str, Compiled],
+        parameters: Optional[_AnyMultiExecuteParams],
+    ) -> CursorResult[Any]:
+        """continue the _execute_context() method for a single DBAPI
+        cursor.execute() or cursor.executemany() call.
+    
+        """
+        if dialect.bind_typing is BindTyping.SETINPUTSIZES:
+            generic_setinputsizes = context._prepare_set_input_sizes()
+    
+            if generic_setinputsizes:
+                try:
+                    dialect.do_set_input_sizes(
+                        context.cursor, generic_setinputsizes, context
+                    )
+                except BaseException as e:
+                    self._handle_dbapi_exception(
+                        e, str(statement), parameters, None, context
+                    )
+    
+        cursor, str_statement, parameters = (
+            context.cursor,
+            context.statement,
+            context.parameters,
+        )
+    
+        effective_parameters: Optional[_AnyExecuteParams]
+    
+        if not context.executemany:
+            effective_parameters = parameters[0]
+        else:
+            effective_parameters = parameters
+    
+        if self._has_events or self.engine._has_events:
+            for fn in self.dispatch.before_cursor_execute:
+                str_statement, effective_parameters = fn(
+                    self,
+                    cursor,
+                    str_statement,
+                    effective_parameters,
+                    context,
+                    context.executemany,
+                )
+    
+        if self._echo:
+            self._log_info(str_statement)
+    
+            stats = context._get_cache_stats()
+    
+            if not self.engine.hide_parameters:
+                self._log_info(
+                    "[%s] %r",
+                    stats,
+                    sql_util._repr_params(
+                        effective_parameters,
+                        batches=10,
+                        ismulti=context.executemany,
+                    ),
+                )
+            else:
+                self._log_info(
+                    "[%s] [SQL parameters hidden due to hide_parameters=True]",
+                    stats,
+                )
+    
+        evt_handled: bool = False
+        try:
+            if context.execute_style is ExecuteStyle.EXECUTEMANY:
+                effective_parameters = cast(
+                    "_CoreMultiExecuteParams", effective_parameters
+                )
+                if self.dialect._has_events:
+                    for fn in self.dialect.dispatch.do_executemany:
+                        if fn(
+                            cursor,
+                            str_statement,
+                            effective_parameters,
+                            context,
+                        ):
+                            evt_handled = True
+                            break
+                if not evt_handled:
+                    self.dialect.do_executemany(
+                        cursor,
+                        str_statement,
+                        effective_parameters,
+                        context,
+                    )
+            elif not effective_parameters and context.no_parameters:
+                if self.dialect._has_events:
+                    for fn in self.dialect.dispatch.do_execute_no_params:
+                        if fn(cursor, str_statement, context):
+                            evt_handled = True
+                            break
+                if not evt_handled:
+                    self.dialect.do_execute_no_params(
+                        cursor, str_statement, context
+                    )
+            else:
+                effective_parameters = cast(
+                    "_CoreSingleExecuteParams", effective_parameters
+                )
+                if self.dialect._has_events:
+                    for fn in self.dialect.dispatch.do_execute:
+                        if fn(
+                            cursor,
+                            str_statement,
+                            effective_parameters,
+                            context,
+                        ):
+                            evt_handled = True
+                            break
+                if not evt_handled:
+>                   self.dialect.do_execute(
+                        cursor, str_statement, effective_parameters, context
+                    )
+
+/usr/local/lib/python3.11/site-packages/sqlalchemy/engine/base.py:1960: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = <sqlalchemy.dialects.postgresql.psycopg2.PGDialect_psycopg2 object at 0x7f6615bff6d0>
+cursor = <cursor object at 0x7f661217ca90; closed: -1>
+statement = 'INSERT INTO books (title, author, isbn, genre_id, series_id, volume, cover_path, read_status) VALUES (%(title)s, %(author)s, %(isbn)s, %(genre_id)s, %(series_id)s, %(volume)s, %(cover_path)s, %(read_status)s) RETURNING books.id'
+parameters = {'author': 'J. K. Lantern', 'cover_path': 'uploads/fake_cover.jpg', 'genre_id': 1, 'isbn': '9780123456789', ...}
+context = <sqlalchemy.dialects.postgresql.psycopg2.PGExecutionContext_psycopg2 object at 0x7f6610670150>
+
+    def do_execute(self, cursor, statement, parameters, context=None):
+>       cursor.execute(statement, parameters)
+E       psycopg2.errors.UniqueViolation: duplicate key value violates unique constraint "books_isbn_key"
+E       DETAIL:  Key (isbn)=(9780123456789) already exists.
+
+/usr/local/lib/python3.11/site-packages/sqlalchemy/engine/default.py:924: UniqueViolation
+
+The above exception was the direct cause of the following exception:
+
+client = <starlette.testclient.TestClient object at 0x7f66121b4950>
+
+    def test_update_book(client):
+        headers = create_admin(client)
+>       book = create_book(client, headers)
+
+tests/test_books.py:35: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/test_factory.py:56: in create_book
+    res = client.post("/books/", json=book_data, headers=headers)
+/usr/local/lib/python3.11/site-packages/starlette/testclient.py:608: in post
+    return super().post(
+/usr/local/lib/python3.11/site-packages/httpx/_client.py:1145: in post
+    return self.request(
+/usr/local/lib/python3.11/site-packages/starlette/testclient.py:491: in request
+    return super().request(
+/usr/local/lib/python3.11/site-packages/httpx/_client.py:827: in request
+    return self.send(request, auth=auth, follow_redirects=follow_redirects)
+/usr/local/lib/python3.11/site-packages/httpx/_client.py:914: in send
+    response = self._send_handling_auth(
+/usr/local/lib/python3.11/site-packages/httpx/_client.py:942: in _send_handling_auth
+    response = self._send_handling_redirects(
+/usr/local/lib/python3.11/site-packages/httpx/_client.py:979: in _send_handling_redirects
+    response = self._send_single_request(request)
+/usr/local/lib/python3.11/site-packages/httpx/_client.py:1015: in _send_single_request
+    response = transport.handle_request(request)
+/usr/local/lib/python3.11/site-packages/starlette/testclient.py:372: in handle_request
+    raise exc
+/usr/local/lib/python3.11/site-packages/starlette/testclient.py:369: in handle_request
+    portal.call(self.app, scope, receive, send)
+/usr/local/lib/python3.11/site-packages/anyio/from_thread.py:290: in call
+    return cast(T_Retval, self.start_task_soon(func, *args).result())
+/usr/local/lib/python3.11/concurrent/futures/_base.py:456: in result
+    return self.__get_result()
+/usr/local/lib/python3.11/concurrent/futures/_base.py:401: in __get_result
+    raise self._exception
+/usr/local/lib/python3.11/site-packages/anyio/from_thread.py:221: in _call_func
+    retval = await retval_or_awaitable
+/usr/local/lib/python3.11/site-packages/fastapi/applications.py:1054: in __call__
+    await super().__call__(scope, receive, send)
+/usr/local/lib/python3.11/site-packages/starlette/applications.py:123: in __call__
+    await self.middleware_stack(scope, receive, send)
+/usr/local/lib/python3.11/site-packages/starlette/middleware/errors.py:186: in __call__
+    raise exc
+/usr/local/lib/python3.11/site-packages/starlette/middleware/errors.py:164: in __call__
+    await self.app(scope, receive, _send)
+/usr/local/lib/python3.11/site-packages/starlette/middleware/exceptions.py:62: in __call__
+    await wrap_app_handling_exceptions(self.app, conn)(scope, receive, send)
+/usr/local/lib/python3.11/site-packages/starlette/_exception_handler.py:64: in wrapped_app
+    raise exc
+/usr/local/lib/python3.11/site-packages/starlette/_exception_handler.py:53: in wrapped_app
+    await app(scope, receive, sender)
+/usr/local/lib/python3.11/site-packages/starlette/routing.py:758: in __call__
+    await self.middleware_stack(scope, receive, send)
+/usr/local/lib/python3.11/site-packages/starlette/routing.py:778: in app
+    await route.handle(scope, receive, send)
+/usr/local/lib/python3.11/site-packages/starlette/routing.py:299: in handle
+    await self.app(scope, receive, send)
+/usr/local/lib/python3.11/site-packages/starlette/routing.py:79: in app
+    await wrap_app_handling_exceptions(app, request)(scope, receive, send)
+/usr/local/lib/python3.11/site-packages/starlette/_exception_handler.py:64: in wrapped_app
+    raise exc
+/usr/local/lib/python3.11/site-packages/starlette/_exception_handler.py:53: in wrapped_app
+    await app(scope, receive, sender)
+/usr/local/lib/python3.11/site-packages/starlette/routing.py:74: in app
+    response = await func(request)
+/usr/local/lib/python3.11/site-packages/fastapi/routing.py:278: in app
+    raw_response = await run_endpoint_function(
+/usr/local/lib/python3.11/site-packages/fastapi/routing.py:193: in run_endpoint_function
+    return await run_in_threadpool(dependant.call, **values)
+/usr/local/lib/python3.11/site-packages/starlette/concurrency.py:42: in run_in_threadpool
+    return await anyio.to_thread.run_sync(func, *args)
+/usr/local/lib/python3.11/site-packages/anyio/to_thread.py:56: in run_sync
+    return await get_async_backend().run_sync_in_worker_thread(
+/usr/local/lib/python3.11/site-packages/anyio/_backends/_asyncio.py:2470: in run_sync_in_worker_thread
+    return await future
+/usr/local/lib/python3.11/site-packages/anyio/_backends/_asyncio.py:967: in run
+    result = context.run(func, *args)
+app/routers/books.py:58: in create_book
+    db.commit()
+/usr/local/lib/python3.11/site-packages/sqlalchemy/orm/session.py:1972: in commit
+    trans.commit(_to_root=True)
+<string>:2: in commit
+    ???
+/usr/local/lib/python3.11/site-packages/sqlalchemy/orm/state_changes.py:139: in _go
+    ret_value = fn(self, *arg, **kw)
+/usr/local/lib/python3.11/site-packages/sqlalchemy/orm/session.py:1257: in commit
+    self._prepare_impl()
+<string>:2: in _prepare_impl
+    ???
+/usr/local/lib/python3.11/site-packages/sqlalchemy/orm/state_changes.py:139: in _go
+    ret_value = fn(self, *arg, **kw)
+/usr/local/lib/python3.11/site-packages/sqlalchemy/orm/session.py:1232: in _prepare_impl
+    self.session.flush()
+/usr/local/lib/python3.11/site-packages/sqlalchemy/orm/session.py:4296: in flush
+    self._flush(objects)
+/usr/local/lib/python3.11/site-packages/sqlalchemy/orm/session.py:4431: in _flush
+    with util.safe_reraise():
+/usr/local/lib/python3.11/site-packages/sqlalchemy/util/langhelpers.py:146: in __exit__
+    raise exc_value.with_traceback(exc_tb)
+/usr/local/lib/python3.11/site-packages/sqlalchemy/orm/session.py:4392: in _flush
+    flush_context.execute()
+/usr/local/lib/python3.11/site-packages/sqlalchemy/orm/unitofwork.py:466: in execute
+    rec.execute(self)
+/usr/local/lib/python3.11/site-packages/sqlalchemy/orm/unitofwork.py:642: in execute
+    util.preloaded.orm_persistence.save_obj(
+/usr/local/lib/python3.11/site-packages/sqlalchemy/orm/persistence.py:93: in save_obj
+    _emit_insert_statements(
+/usr/local/lib/python3.11/site-packages/sqlalchemy/orm/persistence.py:1233: in _emit_insert_statements
+    result = connection.execute(
+/usr/local/lib/python3.11/site-packages/sqlalchemy/engine/base.py:1408: in execute
+    return meth(
+/usr/local/lib/python3.11/site-packages/sqlalchemy/sql/elements.py:513: in _execute_on_connection
+    return connection._execute_clauseelement(
+/usr/local/lib/python3.11/site-packages/sqlalchemy/engine/base.py:1630: in _execute_clauseelement
+    ret = self._execute_context(
+/usr/local/lib/python3.11/site-packages/sqlalchemy/engine/base.py:1839: in _execute_context
+    return self._exec_single_context(
+/usr/local/lib/python3.11/site-packages/sqlalchemy/engine/base.py:1979: in _exec_single_context
+    self._handle_dbapi_exception(
+/usr/local/lib/python3.11/site-packages/sqlalchemy/engine/base.py:2335: in _handle_dbapi_exception
+    raise sqlalchemy_exception.with_traceback(exc_info[2]) from e
+/usr/local/lib/python3.11/site-packages/sqlalchemy/engine/base.py:1960: in _exec_single_context
+    self.dialect.do_execute(
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = <sqlalchemy.dialects.postgresql.psycopg2.PGDialect_psycopg2 object at 0x7f6615bff6d0>
+cursor = <cursor object at 0x7f661217ca90; closed: -1>
+statement = 'INSERT INTO books (title, author, isbn, genre_id, series_id, volume, cover_path, read_status) VALUES (%(title)s, %(author)s, %(isbn)s, %(genre_id)s, %(series_id)s, %(volume)s, %(cover_path)s, %(read_status)s) RETURNING books.id'
+parameters = {'author': 'J. K. Lantern', 'cover_path': 'uploads/fake_cover.jpg', 'genre_id': 1, 'isbn': '9780123456789', ...}
+context = <sqlalchemy.dialects.postgresql.psycopg2.PGExecutionContext_psycopg2 object at 0x7f6610670150>
+
+    def do_execute(self, cursor, statement, parameters, context=None):
+>       cursor.execute(statement, parameters)
+E       sqlalchemy.exc.IntegrityError: (psycopg2.errors.UniqueViolation) duplicate key value violates unique constraint "books_isbn_key"
+E       DETAIL:  Key (isbn)=(9780123456789) already exists.
+E       
+E       [SQL: INSERT INTO books (title, author, isbn, genre_id, series_id, volume, cover_path, read_status) VALUES (%(title)s, %(author)s, %(isbn)s, %(genre_id)s, %(series_id)s, %(volume)s, %(cover_path)s, %(read_status)s) RETURNING books.id]
+E       [parameters: {'title': 'The Hollow Beacon', 'author': 'J. K. Lantern', 'isbn': '9780123456789', 'genre_id': 1, 'series_id': 1, 'volume': 1, 'cover_path': 'uploads/fake_cover.jpg', 'read_status': None}]
+E       (Background on this error at: https://sqlalche.me/e/20/gkpj)
+
+/usr/local/lib/python3.11/site-packages/sqlalchemy/engine/default.py:924: IntegrityError
+_______________________________ test_delete_book _______________________________
+
+self = <sqlalchemy.engine.base.Connection object at 0x7f660af927d0>
+dialect = <sqlalchemy.dialects.postgresql.psycopg2.PGDialect_psycopg2 object at 0x7f6615bff6d0>
+context = <sqlalchemy.dialects.postgresql.psycopg2.PGExecutionContext_psycopg2 object at 0x7f660ab93110>
+statement = <sqlalchemy.dialects.postgresql.base.PGCompiler object at 0x7f66105d1810>
+parameters = [{'author': 'J. K. Lantern', 'cover_path': 'uploads/fake_cover.jpg', 'genre_id': 1, 'isbn': '9780123456789', ...}]
+
+    def _exec_single_context(
+        self,
+        dialect: Dialect,
+        context: ExecutionContext,
+        statement: Union[str, Compiled],
+        parameters: Optional[_AnyMultiExecuteParams],
+    ) -> CursorResult[Any]:
+        """continue the _execute_context() method for a single DBAPI
+        cursor.execute() or cursor.executemany() call.
+    
+        """
+        if dialect.bind_typing is BindTyping.SETINPUTSIZES:
+            generic_setinputsizes = context._prepare_set_input_sizes()
+    
+            if generic_setinputsizes:
+                try:
+                    dialect.do_set_input_sizes(
+                        context.cursor, generic_setinputsizes, context
+                    )
+                except BaseException as e:
+                    self._handle_dbapi_exception(
+                        e, str(statement), parameters, None, context
+                    )
+    
+        cursor, str_statement, parameters = (
+            context.cursor,
+            context.statement,
+            context.parameters,
+        )
+    
+        effective_parameters: Optional[_AnyExecuteParams]
+    
+        if not context.executemany:
+            effective_parameters = parameters[0]
+        else:
+            effective_parameters = parameters
+    
+        if self._has_events or self.engine._has_events:
+            for fn in self.dispatch.before_cursor_execute:
+                str_statement, effective_parameters = fn(
+                    self,
+                    cursor,
+                    str_statement,
+                    effective_parameters,
+                    context,
+                    context.executemany,
+                )
+    
+        if self._echo:
+            self._log_info(str_statement)
+    
+            stats = context._get_cache_stats()
+    
+            if not self.engine.hide_parameters:
+                self._log_info(
+                    "[%s] %r",
+                    stats,
+                    sql_util._repr_params(
+                        effective_parameters,
+                        batches=10,
+                        ismulti=context.executemany,
+                    ),
+                )
+            else:
+                self._log_info(
+                    "[%s] [SQL parameters hidden due to hide_parameters=True]",
+                    stats,
+                )
+    
+        evt_handled: bool = False
+        try:
+            if context.execute_style is ExecuteStyle.EXECUTEMANY:
+                effective_parameters = cast(
+                    "_CoreMultiExecuteParams", effective_parameters
+                )
+                if self.dialect._has_events:
+                    for fn in self.dialect.dispatch.do_executemany:
+                        if fn(
+                            cursor,
+                            str_statement,
+                            effective_parameters,
+                            context,
+                        ):
+                            evt_handled = True
+                            break
+                if not evt_handled:
+                    self.dialect.do_executemany(
+                        cursor,
+                        str_statement,
+                        effective_parameters,
+                        context,
+                    )
+            elif not effective_parameters and context.no_parameters:
+                if self.dialect._has_events:
+                    for fn in self.dialect.dispatch.do_execute_no_params:
+                        if fn(cursor, str_statement, context):
+                            evt_handled = True
+                            break
+                if not evt_handled:
+                    self.dialect.do_execute_no_params(
+                        cursor, str_statement, context
+                    )
+            else:
+                effective_parameters = cast(
+                    "_CoreSingleExecuteParams", effective_parameters
+                )
+                if self.dialect._has_events:
+                    for fn in self.dialect.dispatch.do_execute:
+                        if fn(
+                            cursor,
+                            str_statement,
+                            effective_parameters,
+                            context,
+                        ):
+                            evt_handled = True
+                            break
+                if not evt_handled:
+>                   self.dialect.do_execute(
+                        cursor, str_statement, effective_parameters, context
+                    )
+
+/usr/local/lib/python3.11/site-packages/sqlalchemy/engine/base.py:1960: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = <sqlalchemy.dialects.postgresql.psycopg2.PGDialect_psycopg2 object at 0x7f6615bff6d0>
+cursor = <cursor object at 0x7f661217e6b0; closed: -1>
+statement = 'INSERT INTO books (title, author, isbn, genre_id, series_id, volume, cover_path, read_status) VALUES (%(title)s, %(author)s, %(isbn)s, %(genre_id)s, %(series_id)s, %(volume)s, %(cover_path)s, %(read_status)s) RETURNING books.id'
+parameters = {'author': 'J. K. Lantern', 'cover_path': 'uploads/fake_cover.jpg', 'genre_id': 1, 'isbn': '9780123456789', ...}
+context = <sqlalchemy.dialects.postgresql.psycopg2.PGExecutionContext_psycopg2 object at 0x7f660ab93110>
+
+    def do_execute(self, cursor, statement, parameters, context=None):
+>       cursor.execute(statement, parameters)
+E       psycopg2.errors.UniqueViolation: duplicate key value violates unique constraint "books_isbn_key"
+E       DETAIL:  Key (isbn)=(9780123456789) already exists.
+
+/usr/local/lib/python3.11/site-packages/sqlalchemy/engine/default.py:924: UniqueViolation
+
+The above exception was the direct cause of the following exception:
+
+client = <starlette.testclient.TestClient object at 0x7f66121b4950>
+
+    def test_delete_book(client):
+        headers = create_admin(client)
+>       book = create_book(client, headers)
+
+tests/test_books.py:45: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/test_factory.py:56: in create_book
+    res = client.post("/books/", json=book_data, headers=headers)
+/usr/local/lib/python3.11/site-packages/starlette/testclient.py:608: in post
+    return super().post(
+/usr/local/lib/python3.11/site-packages/httpx/_client.py:1145: in post
+    return self.request(
+/usr/local/lib/python3.11/site-packages/starlette/testclient.py:491: in request
+    return super().request(
+/usr/local/lib/python3.11/site-packages/httpx/_client.py:827: in request
+    return self.send(request, auth=auth, follow_redirects=follow_redirects)
+/usr/local/lib/python3.11/site-packages/httpx/_client.py:914: in send
+    response = self._send_handling_auth(
+/usr/local/lib/python3.11/site-packages/httpx/_client.py:942: in _send_handling_auth
+    response = self._send_handling_redirects(
+/usr/local/lib/python3.11/site-packages/httpx/_client.py:979: in _send_handling_redirects
+    response = self._send_single_request(request)
+/usr/local/lib/python3.11/site-packages/httpx/_client.py:1015: in _send_single_request
+    response = transport.handle_request(request)
+/usr/local/lib/python3.11/site-packages/starlette/testclient.py:372: in handle_request
+    raise exc
+/usr/local/lib/python3.11/site-packages/starlette/testclient.py:369: in handle_request
+    portal.call(self.app, scope, receive, send)
+/usr/local/lib/python3.11/site-packages/anyio/from_thread.py:290: in call
+    return cast(T_Retval, self.start_task_soon(func, *args).result())
+/usr/local/lib/python3.11/concurrent/futures/_base.py:456: in result
+    return self.__get_result()
+/usr/local/lib/python3.11/concurrent/futures/_base.py:401: in __get_result
+    raise self._exception
+/usr/local/lib/python3.11/site-packages/anyio/from_thread.py:221: in _call_func
+    retval = await retval_or_awaitable
+/usr/local/lib/python3.11/site-packages/fastapi/applications.py:1054: in __call__
+    await super().__call__(scope, receive, send)
+/usr/local/lib/python3.11/site-packages/starlette/applications.py:123: in __call__
+    await self.middleware_stack(scope, receive, send)
+/usr/local/lib/python3.11/site-packages/starlette/middleware/errors.py:186: in __call__
+    raise exc
+/usr/local/lib/python3.11/site-packages/starlette/middleware/errors.py:164: in __call__
+    await self.app(scope, receive, _send)
+/usr/local/lib/python3.11/site-packages/starlette/middleware/exceptions.py:62: in __call__
+    await wrap_app_handling_exceptions(self.app, conn)(scope, receive, send)
+/usr/local/lib/python3.11/site-packages/starlette/_exception_handler.py:64: in wrapped_app
+    raise exc
+/usr/local/lib/python3.11/site-packages/starlette/_exception_handler.py:53: in wrapped_app
+    await app(scope, receive, sender)
+/usr/local/lib/python3.11/site-packages/starlette/routing.py:758: in __call__
+    await self.middleware_stack(scope, receive, send)
+/usr/local/lib/python3.11/site-packages/starlette/routing.py:778: in app
+    await route.handle(scope, receive, send)
+/usr/local/lib/python3.11/site-packages/starlette/routing.py:299: in handle
+    await self.app(scope, receive, send)
+/usr/local/lib/python3.11/site-packages/starlette/routing.py:79: in app
+    await wrap_app_handling_exceptions(app, request)(scope, receive, send)
+/usr/local/lib/python3.11/site-packages/starlette/_exception_handler.py:64: in wrapped_app
+    raise exc
+/usr/local/lib/python3.11/site-packages/starlette/_exception_handler.py:53: in wrapped_app
+    await app(scope, receive, sender)
+/usr/local/lib/python3.11/site-packages/starlette/routing.py:74: in app
+    response = await func(request)
+/usr/local/lib/python3.11/site-packages/fastapi/routing.py:278: in app
+    raw_response = await run_endpoint_function(
+/usr/local/lib/python3.11/site-packages/fastapi/routing.py:193: in run_endpoint_function
+    return await run_in_threadpool(dependant.call, **values)
+/usr/local/lib/python3.11/site-packages/starlette/concurrency.py:42: in run_in_threadpool
+    return await anyio.to_thread.run_sync(func, *args)
+/usr/local/lib/python3.11/site-packages/anyio/to_thread.py:56: in run_sync
+    return await get_async_backend().run_sync_in_worker_thread(
+/usr/local/lib/python3.11/site-packages/anyio/_backends/_asyncio.py:2470: in run_sync_in_worker_thread
+    return await future
+/usr/local/lib/python3.11/site-packages/anyio/_backends/_asyncio.py:967: in run
+    result = context.run(func, *args)
+app/routers/books.py:58: in create_book
+    db.commit()
+/usr/local/lib/python3.11/site-packages/sqlalchemy/orm/session.py:1972: in commit
+    trans.commit(_to_root=True)
+<string>:2: in commit
+    ???
+/usr/local/lib/python3.11/site-packages/sqlalchemy/orm/state_changes.py:139: in _go
+    ret_value = fn(self, *arg, **kw)
+/usr/local/lib/python3.11/site-packages/sqlalchemy/orm/session.py:1257: in commit
+    self._prepare_impl()
+<string>:2: in _prepare_impl
+    ???
+/usr/local/lib/python3.11/site-packages/sqlalchemy/orm/state_changes.py:139: in _go
+    ret_value = fn(self, *arg, **kw)
+/usr/local/lib/python3.11/site-packages/sqlalchemy/orm/session.py:1232: in _prepare_impl
+    self.session.flush()
+/usr/local/lib/python3.11/site-packages/sqlalchemy/orm/session.py:4296: in flush
+    self._flush(objects)
+/usr/local/lib/python3.11/site-packages/sqlalchemy/orm/session.py:4431: in _flush
+    with util.safe_reraise():
+/usr/local/lib/python3.11/site-packages/sqlalchemy/util/langhelpers.py:146: in __exit__
+    raise exc_value.with_traceback(exc_tb)
+/usr/local/lib/python3.11/site-packages/sqlalchemy/orm/session.py:4392: in _flush
+    flush_context.execute()
+/usr/local/lib/python3.11/site-packages/sqlalchemy/orm/unitofwork.py:466: in execute
+    rec.execute(self)
+/usr/local/lib/python3.11/site-packages/sqlalchemy/orm/unitofwork.py:642: in execute
+    util.preloaded.orm_persistence.save_obj(
+/usr/local/lib/python3.11/site-packages/sqlalchemy/orm/persistence.py:93: in save_obj
+    _emit_insert_statements(
+/usr/local/lib/python3.11/site-packages/sqlalchemy/orm/persistence.py:1233: in _emit_insert_statements
+    result = connection.execute(
+/usr/local/lib/python3.11/site-packages/sqlalchemy/engine/base.py:1408: in execute
+    return meth(
+/usr/local/lib/python3.11/site-packages/sqlalchemy/sql/elements.py:513: in _execute_on_connection
+    return connection._execute_clauseelement(
+/usr/local/lib/python3.11/site-packages/sqlalchemy/engine/base.py:1630: in _execute_clauseelement
+    ret = self._execute_context(
+/usr/local/lib/python3.11/site-packages/sqlalchemy/engine/base.py:1839: in _execute_context
+    return self._exec_single_context(
+/usr/local/lib/python3.11/site-packages/sqlalchemy/engine/base.py:1979: in _exec_single_context
+    self._handle_dbapi_exception(
+/usr/local/lib/python3.11/site-packages/sqlalchemy/engine/base.py:2335: in _handle_dbapi_exception
+    raise sqlalchemy_exception.with_traceback(exc_info[2]) from e
+/usr/local/lib/python3.11/site-packages/sqlalchemy/engine/base.py:1960: in _exec_single_context
+    self.dialect.do_execute(
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = <sqlalchemy.dialects.postgresql.psycopg2.PGDialect_psycopg2 object at 0x7f6615bff6d0>
+cursor = <cursor object at 0x7f661217e6b0; closed: -1>
+statement = 'INSERT INTO books (title, author, isbn, genre_id, series_id, volume, cover_path, read_status) VALUES (%(title)s, %(author)s, %(isbn)s, %(genre_id)s, %(series_id)s, %(volume)s, %(cover_path)s, %(read_status)s) RETURNING books.id'
+parameters = {'author': 'J. K. Lantern', 'cover_path': 'uploads/fake_cover.jpg', 'genre_id': 1, 'isbn': '9780123456789', ...}
+context = <sqlalchemy.dialects.postgresql.psycopg2.PGExecutionContext_psycopg2 object at 0x7f660ab93110>
+
+    def do_execute(self, cursor, statement, parameters, context=None):
+>       cursor.execute(statement, parameters)
+E       sqlalchemy.exc.IntegrityError: (psycopg2.errors.UniqueViolation) duplicate key value violates unique constraint "books_isbn_key"
+E       DETAIL:  Key (isbn)=(9780123456789) already exists.
+E       
+E       [SQL: INSERT INTO books (title, author, isbn, genre_id, series_id, volume, cover_path, read_status) VALUES (%(title)s, %(author)s, %(isbn)s, %(genre_id)s, %(series_id)s, %(volume)s, %(cover_path)s, %(read_status)s) RETURNING books.id]
+E       [parameters: {'title': 'The Hollow Beacon', 'author': 'J. K. Lantern', 'isbn': '9780123456789', 'genre_id': 1, 'series_id': 1, 'volume': 1, 'cover_path': 'uploads/fake_cover.jpg', 'read_status': None}]
+E       (Background on this error at: https://sqlalche.me/e/20/gkpj)
+
+/usr/local/lib/python3.11/site-packages/sqlalchemy/engine/default.py:924: IntegrityError
+___________________________ test_upload_cover_image ____________________________
+
+client = <starlette.testclient.TestClient object at 0x7f660a7f9b90>
+
+    def test_upload_cover_image(client):
+        headers = create_admin(client)
+    
+        # Create dummy image file for upload
+>       TEMP_FILE.write_bytes(os.urandom(1024))
+
+tests/test_upload.py:13: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+/usr/local/lib/python3.11/pathlib.py:1067: in write_bytes
+    with self.open(mode='wb') as f:
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = PosixPath('/app/backend/tests/test_cover.jpg'), mode = 'wb'
+buffering = -1, encoding = None, errors = None, newline = None
+
+    def open(self, mode='r', buffering=-1, encoding=None,
+             errors=None, newline=None):
+        """
+        Open the file pointed by this path and return a file object, as
+        the built-in open() function does.
+        """
+        if "b" not in mode:
+            encoding = io.text_encoding(encoding)
+>       return io.open(self, mode, buffering, encoding, errors, newline)
+E       FileNotFoundError: [Errno 2] No such file or directory: '/app/backend/tests/test_cover.jpg'
+
+/usr/local/lib/python3.11/pathlib.py:1044: FileNotFoundError
+=============================== warnings summary ===============================
+tests/test_books.py::test_create_and_get_book
+tests/test_books.py::test_update_book
+tests/test_books.py::test_delete_book
+tests/test_user_books.py::test_add_reading_status
+  /usr/local/lib/python3.11/site-packages/pydantic/main.py:1024: PydanticDeprecatedSince20: The `dict` method is deprecated; use `model_dump` instead. Deprecated in Pydantic V2.0 to be removed in V3.0. See Pydantic V2 Migration Guide at https://errors.pydantic.dev/2.6/migration/
+    warnings.warn('The `dict` method is deprecated; use `model_dump` instead.', category=PydanticDeprecatedSince20)
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+=========================== short test summary info ============================
+FAILED tests/test_books.py::test_update_book - sqlalchemy.exc.IntegrityError:...
+FAILED tests/test_books.py::test_delete_book - sqlalchemy.exc.IntegrityError:...
+FAILED tests/test_upload.py::test_upload_cover_image - FileNotFoundError: [Er...
+ERROR tests/test_user_books.py::test_add_reading_status - sqlalchemy.exc.Inte...
+ERROR tests/test_user_books.py::test_get_reading_status - sqlalchemy.exc.Inte...
+ERROR tests/test_user_books.py::test_update_reading_status - sqlalchemy.exc.I...
+ERROR tests/test_user_books.py::test_list_reading_statuses - sqlalchemy.exc.I...
+ERROR tests/test_user_books.py::test_delete_reading_status - sqlalchemy.exc.I...
+============= 3 failed, 17 passed, 4 warnings, 5 errors in 12.72s ==============

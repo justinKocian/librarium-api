@@ -9,5 +9,6 @@ class GenreCreate(GenreBase):
 class GenreRead(GenreBase):
     id: int
 
-    class Config:
-        from_attributes = True
+    model_config = {
+        "from_attributes": True
+    }

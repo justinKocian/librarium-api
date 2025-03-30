@@ -3,9 +3,9 @@
 from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy.orm import Session
 from fastapi.security import OAuth2PasswordRequestForm
-
+import os
 from app.schemas.auth import Token
-from app.schemas.user import UserCreate, UserRead
+from app.schemas.user import UserCreate, UserRead, UserRole
 from app.services import auth as auth_service
 from app.dependencies.auth import get_current_user
 from app.utils.security import create_access_token
@@ -19,12 +19,16 @@ def register(user_data: UserCreate, db: Session = Depends(get_db)):
     if existing:
         raise HTTPException(status_code=400, detail="Username already exists")
 
+    allow_admin = os.getenv("ALLOW_ADMIN_REGISTRATION", "false").lower() == "true"
+    role = user_data.role if user_data.role == UserRole.admin and allow_admin else UserRole.regular
+
     return auth_service.register_user(
         db,
         username=user_data.username,
         password=user_data.password,
-        role=user_data.role  # pass role along
+        role=role
     )
+
 
 @router.post("/login", response_model=Token)
 def login(form_data: OAuth2PasswordRequestForm = Depends(), db: Session = Depends(get_db)):
