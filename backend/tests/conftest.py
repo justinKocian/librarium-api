@@ -3,7 +3,7 @@ from pathlib import Path
 from dotenv import load_dotenv
 import pytest
 from fastapi.testclient import TestClient
-from sqlalchemy import create_engine
+from sqlalchemy import create_engine, text
 from sqlalchemy.orm import sessionmaker
 
 from app.main import app
@@ -26,9 +26,16 @@ def override_get_db():
 
 app.dependency_overrides[get_db] = override_get_db
 
+# ENUMs aren't dropped when all tables are dropped
+def drop_enum_types(engine):
+    with engine.connect() as conn:
+        conn.execute(text("DROP TYPE IF EXISTS readstatus CASCADE"))
+        conn.commit()
+
 # Reset DB schema once for all tests
 @pytest.fixture(scope="session", autouse=True)
 def reset_database():
+    drop_enum_types(engine)
     Base.metadata.drop_all(bind=engine)
     Base.metadata.create_all(bind=engine)
 
