@@ -15,7 +15,7 @@ def setup_logging():
     formatter = JsonFormatter(log_format)  # Correct usage
 
     # Ensure logs/ directory exists
-    log_dir = "backend/logs"
+    log_dir = "app/logs"
     os.makedirs(log_dir, exist_ok=True)
 
     # Console (stdout) handler

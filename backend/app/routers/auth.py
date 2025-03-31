@@ -10,6 +10,7 @@ from app.services import auth as auth_service
 from app.dependencies.auth import get_current_user
 from app.utils.security import create_access_token
 from app.database import get_db
+from app.core.exceptions import AlreadyExistsException, UnauthorizedException
 
 router = APIRouter()
 
@@ -17,7 +18,7 @@ router = APIRouter()
 def register(user_data: UserCreate, db: Session = Depends(get_db)):
     existing = db.query(auth_service.User).filter_by(username=user_data.username).first()
     if existing:
-        raise HTTPException(status_code=400, detail="Username already exists")
+        raise AlreadyExistsException("Username already exists")
 
     allow_admin = os.getenv("ALLOW_ADMIN_REGISTRATION", "false").lower() == "true"
     role = user_data.role if user_data.role == UserRole.admin and allow_admin else UserRole.regular
@@ -34,7 +35,7 @@ def register(user_data: UserCreate, db: Session = Depends(get_db)):
 def login(form_data: OAuth2PasswordRequestForm = Depends(), db: Session = Depends(get_db)):
     user = auth_service.authenticate_user(db, form_data.username, form_data.password)
     if not user:
-        raise HTTPException(status_code=401, detail="Invalid credentials")
+        raise UnauthorizedException("Invalid credentials")
     token = create_access_token({"sub": user.username})
     return {"access_token": token, "token_type": "bearer"}
 

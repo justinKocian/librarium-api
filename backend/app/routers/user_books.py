@@ -3,10 +3,11 @@
 from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy.orm import Session
 from app.database import get_db
-from app.models.user_books import UserBooks, ReadStatus  # ✅ FIXED: plural name
+from app.models.user_books import UserBooks, ReadStatus
 from app.schemas.user_books import UserBookCreate, UserBookUpdate, UserBookOut
 from app.models.user import User
-from app.dependencies.auth import get_current_user  # ✅ Correct location for auth dependencies
+from app.dependencies.auth import get_current_user
+from app.core.exceptions import AlreadyExistsException, NotFoundException
 
 router = APIRouter()
 
@@ -18,7 +19,7 @@ def create_user_book(
 ):
     existing = db.query(UserBooks).filter_by(user_id=current_user.id, book_id=payload.book_id).first()
     if existing:
-        raise HTTPException(status_code=400, detail="Status already exists for this book")
+        raise AlreadyExistsException("Status already exists for this book")
 
     user_book = UserBooks(
         user_id=current_user.id,
@@ -39,7 +40,7 @@ def update_user_book(
 ):
     user_book = db.query(UserBooks).filter_by(user_id=current_user.id, book_id=book_id).first()
     if not user_book:
-        raise HTTPException(status_code=404, detail="Status not found")
+        raise NotFoundException("Status not found")
 
     user_book.read_status = payload.read_status
     db.commit()
@@ -61,7 +62,7 @@ def get_user_book(
 ):
     user_book = db.query(UserBooks).filter_by(user_id=current_user.id, book_id=book_id).first()
     if not user_book:
-        raise HTTPException(status_code=404, detail="Status not found")
+        raise NotFoundException("Status not found")
     return user_book
 
 @router.delete("/{book_id}", status_code=status.HTTP_204_NO_CONTENT)
@@ -72,7 +73,7 @@ def delete_user_book(
 ):
     user_book = db.query(UserBooks).filter_by(user_id=current_user.id, book_id=book_id).first()
     if not user_book:
-        raise HTTPException(status_code=404, detail="Status not found")
+        raise NotFoundException("Status not found")
 
     db.delete(user_book)
     db.commit()

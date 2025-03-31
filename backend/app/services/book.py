@@ -1,9 +1,11 @@
-from typing import List, Optional
+from typing import List, Optional, Tuple
 from sqlalchemy.orm import Session
 from sqlalchemy import or_, and_
 
 from app.models.book import Book
 from app.models.tag import Tag
+
+from app.utils.pagination import paginate_query
 
 def search_books(
     db: Session,
@@ -15,7 +17,9 @@ def search_books(
     read_status: Optional[str] = None,
     limit: int = 20,
     offset: int = 0,
-) -> List[Book]:
+    sort_by: Optional[str] = "title",
+    sort_order: Optional[str] = "asc",
+) -> Tuple[int, List[Book]]:
     query = db.query(Book)
 
     if q:
@@ -42,4 +46,4 @@ def search_books(
     if read_status:
         query = query.filter(Book.read_status == read_status)
 
-    return query.offset(offset).limit(limit).all()
+    return paginate_query(query, Book, limit, offset, sort_by, sort_order)

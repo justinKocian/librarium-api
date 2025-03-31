@@ -18,7 +18,7 @@ def test_duplicate_username_fails(client):
         "password": "anotherpass",
         "role": "regular"
     })
-    assert res.status_code == 400
+    assert res.status_code == 409
     assert res.json()["detail"] == "Username already exists"
 
 def test_user_can_login(client):

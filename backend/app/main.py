@@ -7,6 +7,7 @@ from dotenv import load_dotenv
 
 from app.core.logging_config import setup_logging
 from app.middleware.logging_middleware import LoggingMiddleware
+from app.core import error_handlers  # ✅ NEW
 from app.database import Base, engine
 from app.routers import auth, users, books, genres, tags, series, upload, user_books
 
@@ -24,6 +25,7 @@ Base.metadata.create_all(bind=engine)
 @asynccontextmanager
 async def lifespan(app: FastAPI):
     logger.info("Application startup complete.")
+    error_handlers.register(app)  # ✅ Register custom handlers
     yield
     logger.info("Application shutdown complete.")
 

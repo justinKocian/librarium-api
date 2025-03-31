@@ -8,6 +8,7 @@ from app.schemas.user import UserRead, UserUpdate, UserWithTokenResponse
 from app.models.user import User
 from app.dependencies.auth import get_current_user, get_current_admin
 from app.services import user as user_service
+from app.core.exceptions import NotFoundException
 
 router = APIRouter()
 
@@ -19,7 +20,7 @@ def list_users(db: Session = Depends(get_db), admin: User = Depends(get_current_
 def get_user(id: int, db: Session = Depends(get_db), admin: User = Depends(get_current_admin)):
     user = user_service.get_user_by_id(db, id)
     if not user:
-        raise HTTPException(status_code=404, detail="User not found")
+        raise NotFoundException("User not found")
     return user
 
 @router.put("/me", response_model=Union[UserRead, UserWithTokenResponse])
@@ -55,6 +56,6 @@ def delete_self(db: Session = Depends(get_db), current_user: User = Depends(get_
 def delete_user(id: int, db: Session = Depends(get_db), admin: User = Depends(get_current_admin)):
     user = user_service.get_user_by_id(db, id)
     if not user:
-        raise HTTPException(status_code=404, detail="User not found")
+        raise NotFoundException("User not found")
     user_service.delete_user(db, user)
     return {"detail": f"User {user.username} deleted"}

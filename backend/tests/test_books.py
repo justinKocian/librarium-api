@@ -29,8 +29,10 @@ def test_list_books(client):
     headers = create_admin(client)
     res = client.get("/books/", headers=headers)
     assert res.status_code == 200
-    assert isinstance(res.json(), list)
-    assert any("Hollow" in b["title"] for b in res.json())
+    data = res.json()
+    assert isinstance(data["items"], list)
+    assert any("Hollow" in b["title"] for b in data["items"])
+
 
 
 def test_update_book(client):
@@ -54,3 +56,19 @@ def test_delete_book(client):
     # Confirm it's gone
     res = client.get(f"/books/{book['id']}", headers=headers)
     assert res.status_code == 404
+
+def test_books_pagination(client):
+    headers = create_admin(client)
+    res = client.get("/books?limit=2&offset=0", headers=headers)
+    assert res.status_code == 200
+    data = res.json()
+    assert "total" in data
+    assert isinstance(data["items"], list)
+
+def test_books_sorting(client):
+    headers = create_admin(client)
+    res = client.get("/books?sort_by=title&sort_order=desc", headers=headers)
+    assert res.status_code == 200
+    data = res.json()
+    assert "total" in data
+    assert isinstance(data["items"], list)
