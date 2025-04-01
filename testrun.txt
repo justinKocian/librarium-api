@@ -1,0 +1,61 @@
+[H[2J[3JRefreshing Dev Environment
+-----------------------------
+Tearing down containers and volumes...
+
+Rebuilding and starting containers...
+#0 building with "default" instance using docker driver
+
+#1 [backend internal] load build definition from Dockerfile
+#1 transferring dockerfile: 267B done
+#1 DONE 0.0s
+
+#2 [backend internal] load metadata for docker.io/library/python:3.11
+#2 DONE 0.3s
+
+#3 [backend internal] load .dockerignore
+#3 transferring context: 2B done
+#3 DONE 0.0s
+
+#4 [backend 1/6] FROM docker.io/library/python:3.11@sha256:ebfa8696e47a68cffebb31e370a93ce57c01bc753f246ceaaef72801d1661351
+#4 DONE 0.0s
+
+#5 [backend internal] load build context
+#5 transferring context: 6.90kB done
+#5 DONE 0.0s
+
+#6 [backend 2/6] WORKDIR /app
+#6 CACHED
+
+#7 [backend 3/6] COPY requirements.txt .
+#7 CACHED
+
+#8 [backend 4/6] RUN pip install --no-cache-dir -r requirements.txt
+#8 CACHED
+
+#9 [backend 5/6] COPY ./app ./app
+#9 DONE 0.1s
+
+#10 [backend 6/6] COPY ./tests ./tests
+#10 DONE 0.2s
+
+#11 [backend] exporting to image
+#11 exporting layers 0.1s done
+#11 writing image sha256:9c859bc24fc29343a614b168af21bcf26d9057d257044d2b0e9d4e00cb6f7e37 done
+#11 naming to docker.io/library/librarium-api-backend done
+#11 DONE 0.1s
+
+#12 [backend] resolving provenance for metadata file
+#12 DONE 0.0s
+
+Waiting for containers to be healthy...
+
+Container Status:
+NAME                      IMAGE                   COMMAND                  SERVICE   CREATED        STATUS                  PORTS
+librarium-api-backend-1   librarium-api-backend   "uvicorn app.main:ap…"   backend   1 second ago   Up Less than a second   0.0.0.0:8000->8000/tcp
+librarium-api-db-1        postgres:15             "docker-entrypoint.s…"   db        1 second ago   Up Less than a second   0.0.0.0:5432->5432/tcp
+librarium-api-pgadmin-1   dpage/pgadmin4          "/entrypoint.sh"         pgadmin   1 second ago   Up Less than a second   443/tcp, 0.0.0.0:5050->80/tcp
+
+Running tests with verbose output...
+🔍 DATABASE_URL from env: postgresql://postgres:password@db:5432/library
+⏳ Database not ready (attempt 1/10), retrying...
+✅ Database connected!

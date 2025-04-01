@@ -21,4 +21,4 @@ def search_keyword(base_dir, keyword, output_file):
 if __name__ == "__main__":
     base_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), ".."))
     output_file = os.path.join(os.path.dirname(__file__), "search_results.txt")
-    search_keyword(base_dir, ".dict", output_file)
+    search_keyword(base_dir, "slowapi", output_file)

@@ -10,7 +10,15 @@ from app.schemas.pagination import PaginatedResponse
 
 router = APIRouter()
 
-@router.get("/", response_model=PaginatedResponse[GenreRead])
+@router.get(
+    "/",
+    response_model=PaginatedResponse[GenreRead],
+    summary="List all genres",
+    description=(
+        "Retrieve a paginated list of all available genres. "
+        "Supports sorting by any field, such as 'name'."
+    )
+)
 def list_genres(
     db: Session = Depends(get_db),
     limit: int = 20,
@@ -20,9 +28,14 @@ def list_genres(
 ):
     query = db.query(Genre)
     total, items = paginate_query(query, Genre, limit, offset, sort_by, sort_order)
-    return {"total": total, "items": items}
+    return PaginatedResponse(total=total, items=items)  # Return PaginatedResponse
 
-@router.post("/", response_model=GenreRead)
+@router.post(
+    "/",
+    response_model=GenreRead,
+    summary="Create a new genre",
+    description="Create a new genre in the catalog. Admin only. Checks if the genre already exists before creating."
+)
 def create_genre(data: GenreCreate, db: Session = Depends(get_db), admin=Depends(get_current_admin)):
     existing = db.query(Genre).filter_by(name=data.name).first()
     if existing:

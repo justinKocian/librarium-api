@@ -10,7 +10,15 @@ from app.schemas.pagination import PaginatedResponse
 
 router = APIRouter()
 
-@router.get("/", response_model=PaginatedResponse[SeriesRead])
+@router.get(
+    "/",
+    response_model=PaginatedResponse[SeriesRead],
+    summary="List all series",
+    description=(
+        "Retrieve a paginated list of all available book series. "
+        "Supports sorting by any field such as 'name'."
+    )
+)
 def list_series(
     db: Session = Depends(get_db),
     limit: int = 20,
@@ -20,10 +28,14 @@ def list_series(
 ):
     query = db.query(Series)
     total, items = paginate_query(query, Series, limit, offset, sort_by, sort_order)
-    return {"total": total, "items": items}
+    return PaginatedResponse(total=total, items=items)  # Return PaginatedResponse
 
-
-@router.post("/", response_model=SeriesRead)
+@router.post(
+    "/",
+    response_model=SeriesRead,
+    summary="Create a new series",
+    description="Create a new book series in the catalog. Admin only. Checks if the series already exists before creating."
+)
 def create_series(data: SeriesCreate, db: Session = Depends(get_db), admin=Depends(get_current_admin)):
     existing = db.query(Series).filter_by(name=data.name).first()
     if existing:

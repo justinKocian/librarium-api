@@ -10,7 +10,15 @@ from app.schemas.pagination import PaginatedResponse
 
 router = APIRouter()
 
-@router.get("/", response_model=PaginatedResponse[TagRead])
+@router.get(
+    "/",
+    response_model=PaginatedResponse[TagRead],
+    summary="List all tags",
+    description=(
+        "Retrieve a paginated list of all available tags. "
+        "Supports sorting by any field such as 'name'."
+    )
+)
 def list_tags(
     db: Session = Depends(get_db),
     limit: int = 20,
@@ -20,9 +28,14 @@ def list_tags(
 ):
     query = db.query(Tag)
     total, items = paginate_query(query, Tag, limit, offset, sort_by, sort_order)
-    return {"total": total, "items": items}
+    return PaginatedResponse(total=total, items=items)  # Return PaginatedResponse instead of a dict
 
-@router.post("/", response_model=TagRead)
+@router.post(
+    "/",
+    response_model=TagRead,
+    summary="Create a new tag",
+    description="Create a new tag in the catalog. Admin only. Checks if the tag already exists before creating."
+)
 def create_tag(data: TagCreate, db: Session = Depends(get_db), admin=Depends(get_current_admin)):
     existing = db.query(Tag).filter_by(name=data.name).first()
     if existing:

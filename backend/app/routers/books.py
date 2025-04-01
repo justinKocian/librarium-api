@@ -15,7 +15,16 @@ from app.core.exceptions import NotFoundException
 
 router = APIRouter()
 
-@router.get("/search", response_model=PaginatedResponse[BookOut])
+@router.get(
+    "/search",
+    response_model=PaginatedResponse[BookOut],
+    summary="Search books",
+    description=(
+        "Search for books using full-text matching across title, author, or ISBN. "
+        "You can also filter by genre, tags, series, volume, and reading status. "
+        "Results are paginated and support sorting."
+    )
+)
 def search_books(
     q: Optional[str] = None,
     genre_id: Optional[int] = None,
@@ -45,7 +54,15 @@ def search_books(
     )
     return {"total": total, "items": books}
 
-@router.get("/", response_model=PaginatedResponse[BookOut])
+@router.get(
+    "/",
+    response_model=PaginatedResponse[BookOut],
+    summary="List all books",
+    description=(
+        "Retrieve a paginated list of all books in the library. "
+        "Supports sorting by any sortable field such as title or author."
+    )
+)
 def get_books(
     db: Session = Depends(get_db),
     limit: int = 20,
@@ -57,14 +74,27 @@ def get_books(
     total, items = paginate_query(query, Book, limit, offset, sort_by, sort_order)
     return {"total": total, "items": items}
 
-@router.get("/{book_id}", response_model=BookOut)
+@router.get(
+    "/{book_id}",
+    response_model=BookOut,
+    summary="Get a book by ID",
+    description="Retrieve detailed information for a specific book using its ID."
+)
 def get_book(book_id: int, db: Session = Depends(get_db)):
     book = db.query(Book).filter(Book.id == book_id).first()
     if not book:
         raise NotFoundException("Book not found")
     return book
 
-@router.post("/", response_model=BookOut)
+@router.post(
+    "/",
+    response_model=BookOut,
+    summary="Create a new book",
+    description=(
+        "Add a new book to the library. Admin only. "
+        "Optionally include tag IDs for assignment during creation."
+    )
+)
 def create_book(data: BookCreate, db: Session = Depends(get_db), admin=Depends(get_current_admin)):
     book = Book(**data.model_dump(exclude={"tag_ids"}))
     if data.tag_ids:
@@ -75,7 +105,15 @@ def create_book(data: BookCreate, db: Session = Depends(get_db), admin=Depends(g
     db.refresh(book)
     return book
 
-@router.put("/{book_id}", response_model=BookOut)
+@router.put(
+    "/{book_id}",
+    response_model=BookOut,
+    summary="Update a book",
+    description=(
+        "Update fields on an existing book by ID. Admin only. "
+        "To change tags, supply a new list of tag IDs."
+    )
+)
 def update_book(book_id: int, data: BookUpdate, db: Session = Depends(get_db), admin=Depends(get_current_admin)):
     book = db.query(Book).filter(Book.id == book_id).first()
     if not book:
@@ -91,7 +129,11 @@ def update_book(book_id: int, data: BookUpdate, db: Session = Depends(get_db), a
     db.refresh(book)
     return book
 
-@router.delete("/{book_id}")
+@router.delete(
+    "/{book_id}",
+    summary="Delete a book",
+    description="Delete a book from the library by ID. Admin only."
+)
 def delete_book(book_id: int, db: Session = Depends(get_db), admin=Depends(get_current_admin)):
     book = db.query(Book).filter(Book.id == book_id).first()
     if not book:

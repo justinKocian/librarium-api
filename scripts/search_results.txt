@@ -1,7 +1,5 @@
-🔍 Searching for '.dict' in /home/justin/librarium-api...
+Searching for 'slowapi' in /home/justin/librarium-api...
 
-/home/justin/librarium-api/backend/app/routers/books.py:53:     book = Book(**data.dict(exclude={"tag_ids"}))
-/home/justin/librarium-api/backend/app/routers/books.py:68:     for field, value in data.dict(exclude_unset=True, exclude={"tag_ids"}).items():
-/home/justin/librarium-api/scripts/keyword_search.py:24:     search_keyword(base_dir, ".dict", output_file)
+/home/justin/librarium-api/scripts/keyword_search.py:24:     search_keyword(base_dir, "slowapi", output_file)
 
-✅ Search complete.
+Search complete.
