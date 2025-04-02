@@ -21,7 +21,7 @@ docker compose ps --format table
 
 echo ""
 echo "Running tests with verbose output..."
-docker compose exec backend pytest -v --disable-warnings --maxfail=5
+docker compose exec api pytest -v --disable-warnings --maxfail=5
 
 echo ""
 echo "Test run complete!"
