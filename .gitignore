@@ -73,3 +73,6 @@ openapi.json
 
 # MacOS folder
 __MACOSX/
+
+# Stuff I keep in my directory but don't commit
+junk/
